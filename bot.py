@@ -171,7 +171,7 @@ def main():
     dp.add_handler(CommandHandler('u', ask_usdt))
     dp.add_handler(CommandHandler('ust', ask_usdt))
     dp.add_handler(CommandHandler('usdt', ask_usdt))
-    pdater.start_webhook(listen="0.0.0.0",
+    updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
     updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
