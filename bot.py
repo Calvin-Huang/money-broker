@@ -72,17 +72,17 @@ def ask_rate(update: Update, context: CallbackContext):
 
 def ask_bito(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
-    to_time = int(utc_now.timestamp())
-    from_time = int((utc_now - timedelta(seconds=1800)).timestamp())
     tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-    price = get_bito_price(from_time, to_time)
+    price = get_bito_price(utc_now)
     if price > -1:
         update.message.reply_text('BitoPro {}\nUSDT = {} TWD'.format(tw_time, price))
     else:
         update.message.reply_text('BitoPro {}\n找不到資料'.format(tw_time))
 
 
-def get_bito_price(from_time: int, to_time: int):
+def get_bito_price(utc_now: datetime):
+    to_time = int(utc_now.timestamp())
+    from_time = int((utc_now - timedelta(seconds=1800)).timestamp())
     r = requests.get(
         'https://api.bitopro.com/v3/trading-history/usdt_twd?resolution=1m&from={}&to={}'.format(from_time, to_time))
     obj = json.loads(r.text)
@@ -132,6 +132,16 @@ def get_max_price():
         return float(obj['data'][0]['price'])
 
 
+def ask_usdt(update: Update, context: CallbackContext):
+    utc_now = datetime.now(timezone.utc)
+    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    bito_price = get_bito_price(utc_now)
+    ace_price = get_ace_price()
+    max_price = get_max_price()
+    update.message.reply_text('USDT Price {}\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD\n'
+                              .format(tw_time, bito_price, ace_price, max_price))
+
+
 def main():
     logger.info('Token = {}'.format(TOKEN))
     updater = Updater(TOKEN)
@@ -146,6 +156,9 @@ def main():
     dp.add_handler(CommandHandler('bito', ask_bito))
     dp.add_handler(CommandHandler('ace', ask_ace))
     dp.add_handler(CommandHandler('max', ask_max))
+    dp.add_handler(CommandHandler('u', ask_usdt))
+    dp.add_handler(CommandHandler('ust', ask_usdt))
+    dp.add_handler(CommandHandler('usdt', ask_usdt))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
