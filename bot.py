@@ -24,12 +24,12 @@ def error(update, context):
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def mastercardRate(update: Update, context: CallbackContext):
-    update.message.reply_text('1 USD = {} TWD'.format(getMastercardRate()))
+def get_mastercard_rate(update: Update, context: CallbackContext):
+    update.message.reply_text('1 USD = {} TWD'.format(get_mastercard_rate()))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def getMastercardRate():
+def get_mastercard_rate():
     headers = {'authority': 'www.mastercard.us',
                'pragma': 'no-cache',
                'cache-control': 'no-cache',
@@ -49,12 +49,12 @@ def getMastercardRate():
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def visaRate(update: Update, context: CallbackContext):
-    update.message.reply_text('1 USD = {} TWD'.format(getVisaRate()))
+def get_visa_rate(update: Update, context: CallbackContext):
+    update.message.reply_text('1 USD = {} TWD'.format(get_visa_rate()))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def getVisaRate():
+def get_visa_rate():
     r = requests.get(
         'https://www.visa.com.tw/travel-with-visa/exchange-rate-calculator.html?fromCurr=TWD&toCurr=USD&fee=0')
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -64,9 +64,9 @@ def getVisaRate():
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def rate(update: Update, context: CallbackContext):
+def get_rate(update: Update, context: CallbackContext):
     update.message.reply_text(
-        'Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(getMastercardRate(), getVisaRate()))
+        'Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(get_mastercard_rate(), get_visa_rate()))
 
 
 def main():
@@ -74,12 +74,12 @@ def main():
     updater = Updater(TOKEN)
     dp = updater.dispatcher
     dp.add_error_handler(error)
-    dp.add_handler(CommandHandler('m', mastercardRate))
-    dp.add_handler(CommandHandler('master', mastercardRate))
-    dp.add_handler(CommandHandler('v', visaRate))
-    dp.add_handler(CommandHandler('visa', visaRate))
-    dp.add_handler(CommandHandler('r', rate))
-    dp.add_handler(CommandHandler('rate', rate))
+    dp.add_handler(CommandHandler('m', get_mastercard_rate))
+    dp.add_handler(CommandHandler('master', get_mastercard_rate))
+    dp.add_handler(CommandHandler('v', get_visa_rate))
+    dp.add_handler(CommandHandler('visa', get_visa_rate))
+    dp.add_handler(CommandHandler('r', get_rate))
+    dp.add_handler(CommandHandler('rate', get_rate))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
