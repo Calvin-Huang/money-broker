@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import requests
+from datetime import datetime, timedelta, timezone
 from cacheout import Cache
 from bs4 import BeautifulSoup
 from telegram import Update
@@ -24,7 +25,7 @@ def error(update, context):
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def get_mastercard_rate(update: Update, context: CallbackContext):
+def ask_mastercard_rate(update: Update, context: CallbackContext):
     update.message.reply_text('1 USD = {} TWD'.format(get_mastercard_rate()))
 
 
@@ -49,7 +50,7 @@ def get_mastercard_rate():
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def get_visa_rate(update: Update, context: CallbackContext):
+def ask_visa_rate(update: Update, context: CallbackContext):
     update.message.reply_text('1 USD = {} TWD'.format(get_visa_rate()))
 
 
@@ -64,9 +65,28 @@ def get_visa_rate():
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def get_rate(update: Update, context: CallbackContext):
+def ask_rate(update: Update, context: CallbackContext):
     update.message.reply_text(
         'Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(get_mastercard_rate(), get_visa_rate()))
+
+
+def ask_bito(update: Update, context: CallbackContext):
+    utc_now = datetime.now(timezone.utc)
+    to_time = int(utc_now.timestamp())
+    from_time = int((utc_now - timedelta(seconds=120)).timestamp())
+    tw_time = utc_now + timedelta(hours=8)
+    update.message.reply_text('BitoPro {}\n{}'.format(tw_time.strftime('%Y-%m-%d %H:%M:%S'),
+                                                    get_bito_price(from_time, to_time)))
+
+
+def get_bito_price(from_time: int, to_time: int):
+    r = requests.get(
+        'https://api.bitopro.com/v3/trading-history/usdt_twd?resolution=1m&from={}&to={}'.format(from_time, to_time))
+    obj = json.loads(r.text)
+    if obj['data'] is None:
+        return '找不到資料'
+    else:
+        return '1 USDT = {} TWD'.format(obj['data'][0]['close'])
 
 
 def main():
@@ -74,12 +94,13 @@ def main():
     updater = Updater(TOKEN)
     dp = updater.dispatcher
     dp.add_error_handler(error)
-    dp.add_handler(CommandHandler('m', get_mastercard_rate))
-    dp.add_handler(CommandHandler('master', get_mastercard_rate))
-    dp.add_handler(CommandHandler('v', get_visa_rate))
-    dp.add_handler(CommandHandler('visa', get_visa_rate))
-    dp.add_handler(CommandHandler('r', get_rate))
-    dp.add_handler(CommandHandler('rate', get_rate))
+    dp.add_handler(CommandHandler('m', ask_mastercard_rate))
+    dp.add_handler(CommandHandler('master', ask_mastercard_rate))
+    dp.add_handler(CommandHandler('v', ask_visa_rate))
+    dp.add_handler(CommandHandler('visa', ask_visa_rate))
+    dp.add_handler(CommandHandler('r', ask_rate))
+    dp.add_handler(CommandHandler('rate', ask_rate))
+    dp.add_handler(CommandHandler('bito', ask_bito))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
