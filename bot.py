@@ -120,7 +120,7 @@ def get_ace_price():
 def ask_max(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
     tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-    price = get_ace_price()
+    price = get_max_price()
     if price > -1:
         update.message.reply_text('Max {}\nUSDT = {} TWD'.format(tw_time, price))
     else:
@@ -150,7 +150,7 @@ def ask_usdt(update: Update, context: CallbackContext):
     logger.info(ace_price)
     max_price = get_max_price()
     logger.info(max_price)
-    update.message.reply_text('USDT Price {}\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD\n'
+    update.message.reply_text('USDT Price {}\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD'
                               .format(tw_time, bito_price, ace_price, max_price))
 
 
