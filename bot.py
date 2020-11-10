@@ -61,16 +61,21 @@ def rate(update: Update, context: CallbackContext):
         'Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(getMastercardRate(), getVisaRate()))
 
 
-updater = Updater(TOKEN)
-updater.dispatcher.add_handler(CommandHandler('m', mastercardRate))
-updater.dispatcher.add_handler(CommandHandler('master', mastercardRate))
-updater.dispatcher.add_handler(CommandHandler('v', visaRate))
-updater.dispatcher.add_handler(CommandHandler('visa', visaRate))
-updater.dispatcher.add_handler(CommandHandler('r', rate))
-updater.dispatcher.add_handler(CommandHandler('rate', rate))
-updater.start_polling()
-# updater.start_webhook(listen="0.0.0.0",
-#                       port=PORT,
-#                       url_path=TOKEN)
-# updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
-updater.idle()
+def main():
+    updater = Updater(TOKEN)
+    updater.dispatcher.add_handler(CommandHandler('m', mastercardRate))
+    updater.dispatcher.add_handler(CommandHandler('master', mastercardRate))
+    updater.dispatcher.add_handler(CommandHandler('v', visaRate))
+    updater.dispatcher.add_handler(CommandHandler('visa', visaRate))
+    updater.dispatcher.add_handler(CommandHandler('r', rate))
+    updater.dispatcher.add_handler(CommandHandler('rate', rate))
+    updater.start_polling()
+    # updater.start_webhook(listen="0.0.0.0",
+    #                       port=PORT,
+    #                       url_path=TOKEN)
+    # updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
