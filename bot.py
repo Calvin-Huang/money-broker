@@ -112,6 +112,26 @@ def get_ace_price():
         return float(obj['attachment'][0]['closePrice'])
 
 
+def ask_max(update: Update, context: CallbackContext):
+    utc_now = datetime.now(timezone.utc)
+    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    price = get_ace_price()
+    if price > -1:
+        update.message.reply_text('Max {}\nUSDT = {} TWD'.format(tw_time, price))
+    else:
+        update.message.reply_text('Max {}\n找不到資料'.format(tw_time, price))
+
+
+def get_max_price():
+    r = requests.get(
+        'https://max.maicoin.com/trades/usdttwd/recent_trades')
+    obj = json.loads(r.text)
+    if not obj['data']:
+        return -1
+    else:
+        return float(obj['data'][0]['price'])
+
+
 def main():
     logger.info('Token = {}'.format(TOKEN))
     updater = Updater(TOKEN)
@@ -125,6 +145,7 @@ def main():
     dp.add_handler(CommandHandler('rate', ask_rate))
     dp.add_handler(CommandHandler('bito', ask_bito))
     dp.add_handler(CommandHandler('ace', ask_ace))
+    dp.add_handler(CommandHandler('max', ask_max))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
