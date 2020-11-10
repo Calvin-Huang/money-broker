@@ -9,9 +9,9 @@ from telegram.ext import (
     CommandHandler,
     CallbackContext)
 
-APPNAME = os.environ["APPNAME"]
+# APPNAME = os.environ["APPNAME"]
 TOKEN = os.environ["TOKEN"]
-PORT = int(os.environ.get('PORT', '8443'))
+# PORT = int(os.environ.get('PORT', '8443'))
 cache = Cache()
 
 
@@ -68,9 +68,9 @@ updater.dispatcher.add_handler(CommandHandler('v', visaRate))
 updater.dispatcher.add_handler(CommandHandler('visa', visaRate))
 updater.dispatcher.add_handler(CommandHandler('r', rate))
 updater.dispatcher.add_handler(CommandHandler('rate', rate))
-# updater.start_polling()
-updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=TOKEN)
-updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
+updater.start_polling()
+# updater.start_webhook(listen="0.0.0.0",
+#                       port=PORT,
+#                       url_path=TOKEN)
+# updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
 updater.idle()
