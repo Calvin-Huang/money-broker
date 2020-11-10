@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import requests
 from cacheout import Cache
@@ -10,9 +11,16 @@ from telegram.ext import (
     CallbackContext)
 
 # APPNAME = os.environ["APPNAME"]
-TOKEN = os.environ["TOKEN"]
 # PORT = int(os.environ.get('PORT', '8443'))
+TOKEN = os.environ["TOKEN"]
 cache = Cache()
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def error(update, context):
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -62,18 +70,21 @@ def rate(update: Update, context: CallbackContext):
 
 
 def main():
+    logger.info('Token = {}'.format(TOKEN))
     updater = Updater(TOKEN)
-    updater.dispatcher.add_handler(CommandHandler('m', mastercardRate))
-    updater.dispatcher.add_handler(CommandHandler('master', mastercardRate))
-    updater.dispatcher.add_handler(CommandHandler('v', visaRate))
-    updater.dispatcher.add_handler(CommandHandler('visa', visaRate))
-    updater.dispatcher.add_handler(CommandHandler('r', rate))
-    updater.dispatcher.add_handler(CommandHandler('rate', rate))
-    updater.start_polling()
+    dp = updater.dispatcher
+    dp.add_error_handler(error)
+    dp.add_handler(CommandHandler('m', mastercardRate))
+    dp.add_handler(CommandHandler('master', mastercardRate))
+    dp.add_handler(CommandHandler('v', visaRate))
+    dp.add_handler(CommandHandler('visa', visaRate))
+    dp.add_handler(CommandHandler('r', rate))
+    dp.add_handler(CommandHandler('rate', rate))
     # updater.start_webhook(listen="0.0.0.0",
     #                       port=PORT,
     #                       url_path=TOKEN)
     # updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
+    updater.start_polling()
     updater.idle()
 
 
