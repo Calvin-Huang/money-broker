@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 from cacheout import Cache
 from bs4 import BeautifulSoup
@@ -8,7 +9,8 @@ from telegram.ext import (
     CommandHandler,
     CallbackContext)
 
-TOKEN = 'YOUR TOKEN HERE'
+
+TOKEN = os.environ["TOKEN"]
 cache = Cache()
 
 
