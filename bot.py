@@ -73,10 +73,13 @@ def ask_rate(update: Update, context: CallbackContext):
 def ask_bito(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
     to_time = int(utc_now.timestamp())
-    from_time = int((utc_now - timedelta(seconds=120)).timestamp())
-    tw_time = utc_now + timedelta(hours=8)
-    update.message.reply_text('BitoPro {}\n{}'.format(tw_time.strftime('%Y-%m-%d %H:%M:%S'),
-                                                    get_bito_price(from_time, to_time)))
+    from_time = int((utc_now - timedelta(seconds=1800)).timestamp())
+    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    price = get_bito_price(from_time, to_time)
+    if price > -1:
+        update.message.reply_text('BitoPro {}\nUSDT = {} TWD'.format(tw_time, price))
+    else:
+        update.message.reply_text('BitoPro {}\n找不到資料'.format(tw_time))
 
 
 def get_bito_price(from_time: int, to_time: int):
@@ -84,9 +87,29 @@ def get_bito_price(from_time: int, to_time: int):
         'https://api.bitopro.com/v3/trading-history/usdt_twd?resolution=1m&from={}&to={}'.format(from_time, to_time))
     obj = json.loads(r.text)
     if obj['data'] is None:
-        return '找不到資料'
+        return -1
     else:
-        return '1 USDT = {} TWD'.format(obj['data'][0]['close'])
+        return float(obj['data'][0]['close'])
+
+
+def ask_ace(update: Update, context: CallbackContext):
+    utc_now = datetime.now(timezone.utc)
+    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    price = get_ace_price()
+    if price > -1:
+        update.message.reply_text('Ace {}\nUSDT = {} TWD'.format(tw_time, price))
+    else:
+        update.message.reply_text('Ace {}\n找不到資料'.format(tw_time, price))
+
+
+def get_ace_price():
+    r = requests.get(
+        'https://www.ace.io/polarisex/quote/getKline?baseCurrencyId=1&tradeCurrencyId=14&limit=1')
+    obj = json.loads(r.text)
+    if not obj['attachment']:
+        return -1
+    else:
+        return float(obj['attachment'][0]['closePrice'])
 
 
 def main():
@@ -101,6 +124,7 @@ def main():
     dp.add_handler(CommandHandler('r', ask_rate))
     dp.add_handler(CommandHandler('rate', ask_rate))
     dp.add_handler(CommandHandler('bito', ask_bito))
+    dp.add_handler(CommandHandler('ace', ask_ace))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
