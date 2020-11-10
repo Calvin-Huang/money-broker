@@ -39,14 +39,22 @@ def visaRate(update: Update, context: CallbackContext):
 
 def getVisaRate():
     r = requests.get('https://www.visa.com.tw/travel-with-visa/exchange-rate-calculator.html?fromCurr=TWD&toCurr=USD&fee=0')
-    soup = BeautifulSoup(r.text)
+    soup = BeautifulSoup(r.text, 'html.parser')
     selector = 'span strong+ strong'
     rate = [i.text for i in soup.select(selector)][0]
     return rate
 
 
+def rate(update: Update, context: CallbackContext):
+    update.message.reply_text('Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(getMastercardRate(), getVisaRate()))
+
+
 updater = Updater(TOKEN)
 updater.dispatcher.add_handler(CommandHandler('m', mastercardRate))
+updater.dispatcher.add_handler(CommandHandler('master', mastercardRate))
 updater.dispatcher.add_handler(CommandHandler('v', visaRate))
+updater.dispatcher.add_handler(CommandHandler('visa', visaRate))
+updater.dispatcher.add_handler(CommandHandler('r', rate))
+updater.dispatcher.add_handler(CommandHandler('rate', rate))
 updater.start_polling()
 updater.idle()
