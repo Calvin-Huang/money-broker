@@ -1,5 +1,6 @@
 import json
 import requests
+from bs4 import BeautifulSoup
 from telegram import Update
 from telegram.ext import (
     Updater,
@@ -32,7 +33,20 @@ def getMastercardRate():
     return obj['data']['conversionRate']
 
 
+def visaRate(update: Update, context: CallbackContext):
+    update.message.reply_text('1 USD = {} TWD'.format(getVisaRate()))
+
+
+def getVisaRate():
+    r = requests.get('https://www.visa.com.tw/travel-with-visa/exchange-rate-calculator.html?fromCurr=TWD&toCurr=USD&fee=0')
+    soup = BeautifulSoup(r.text)
+    selector = 'span strong+ strong'
+    rate = [i.text for i in soup.select(selector)][0]
+    return rate
+
+
 updater = Updater(TOKEN)
 updater.dispatcher.add_handler(CommandHandler('m', mastercardRate))
+updater.dispatcher.add_handler(CommandHandler('v', visaRate))
 updater.start_polling()
 updater.idle()
