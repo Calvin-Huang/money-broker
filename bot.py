@@ -132,6 +132,7 @@ def get_max_price():
     r = requests.get(
         'https://max.maicoin.com/trades/usdttwd/recent_trades')
     obj = json.loads(r.text)
+    logger.info(obj)
     if not obj['data']:
         return -1
     else:
