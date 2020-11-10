@@ -1,5 +1,6 @@
 import json
 import requests
+from cacheout import Cache
 from bs4 import BeautifulSoup
 from telegram import Update
 from telegram.ext import (
@@ -8,12 +9,15 @@ from telegram.ext import (
     CallbackContext)
 
 TOKEN = 'YOUR TOKEN HERE'
+cache = Cache()
 
 
+@cache.memoize(ttl=10 * 60, typed=True)
 def mastercardRate(update: Update, context: CallbackContext):
     update.message.reply_text('1 USD = {} TWD'.format(getMastercardRate()))
 
 
+@cache.memoize(ttl=10 * 60, typed=True)
 def getMastercardRate():
     headers = {'authority': 'www.mastercard.us',
                   'pragma': 'no-cache',
@@ -33,10 +37,12 @@ def getMastercardRate():
     return obj['data']['conversionRate']
 
 
+@cache.memoize(ttl=10 * 60, typed=True)
 def visaRate(update: Update, context: CallbackContext):
     update.message.reply_text('1 USD = {} TWD'.format(getVisaRate()))
 
 
+@cache.memoize(ttl=10 * 60, typed=True)
 def getVisaRate():
     r = requests.get('https://www.visa.com.tw/travel-with-visa/exchange-rate-calculator.html?fromCurr=TWD&toCurr=USD&fee=0')
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -45,6 +51,7 @@ def getVisaRate():
     return rate
 
 
+@cache.memoize(ttl=10 * 60, typed=True)
 def rate(update: Update, context: CallbackContext):
     update.message.reply_text('Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(getMastercardRate(), getVisaRate()))
 
