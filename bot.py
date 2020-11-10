@@ -70,6 +70,7 @@ def ask_rate(update: Update, context: CallbackContext):
         'Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(get_mastercard_rate(), get_visa_rate()))
 
 
+@cache.memoize(ttl=3 * 60, typed=True)
 def ask_bito(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
     tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
@@ -80,6 +81,7 @@ def ask_bito(update: Update, context: CallbackContext):
         update.message.reply_text('BitoPro {}\n找不到資料'.format(tw_time))
 
 
+@cache.memoize(ttl=3 * 60, typed=True)
 def get_bito_price(utc_now: datetime):
     to_time = int(utc_now.timestamp())
     from_time = int((utc_now - timedelta(seconds=1800)).timestamp())
@@ -92,6 +94,7 @@ def get_bito_price(utc_now: datetime):
         return float(obj['data'][0]['close'])
 
 
+@cache.memoize(ttl=3 * 60, typed=True)
 def ask_ace(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
     tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
@@ -102,6 +105,7 @@ def ask_ace(update: Update, context: CallbackContext):
         update.message.reply_text('Ace {}\n找不到資料'.format(tw_time, price))
 
 
+@cache.memoize(ttl=3 * 60, typed=True)
 def get_ace_price():
     r = requests.get(
         'https://www.ace.io/polarisex/quote/getKline?baseCurrencyId=1&tradeCurrencyId=14&limit=1')
@@ -112,6 +116,7 @@ def get_ace_price():
         return float(obj['attachment'][0]['closePrice'])
 
 
+@cache.memoize(ttl=3 * 60, typed=True)
 def ask_max(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
     tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
@@ -122,6 +127,7 @@ def ask_max(update: Update, context: CallbackContext):
         update.message.reply_text('Max {}\n找不到資料'.format(tw_time, price))
 
 
+@cache.memoize(ttl=3 * 60, typed=True)
 def get_max_price():
     r = requests.get(
         'https://max.maicoin.com/trades/usdttwd/recent_trades')
@@ -132,6 +138,7 @@ def get_max_price():
         return float(obj['data'][0]['price'])
 
 
+@cache.memoize(ttl=3 * 60, typed=True)
 def ask_usdt(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
     tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
