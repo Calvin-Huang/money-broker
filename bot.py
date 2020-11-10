@@ -141,10 +141,15 @@ def get_max_price():
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_usdt(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
+    logger.info(utc_now)
     tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(tw_time)
     bito_price = get_bito_price(utc_now)
+    logger.info(bito_price)
     ace_price = get_ace_price()
+    logger.info(ace_price)
     max_price = get_max_price()
+    logger.info(max_price)
     update.message.reply_text('USDT Price {}\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD\n'
                               .format(tw_time, bito_price, ace_price, max_price))
 
@@ -166,7 +171,7 @@ def main():
     dp.add_handler(CommandHandler('u', ask_usdt))
     dp.add_handler(CommandHandler('ust', ask_usdt))
     dp.add_handler(CommandHandler('usdt', ask_usdt))
-    updater.start_webhook(listen="0.0.0.0",
+    pdater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
     updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
