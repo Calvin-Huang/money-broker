@@ -26,7 +26,7 @@ def error(update, context):
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_mastercard_rate(update: Update, context: CallbackContext):
-    update.message.reply_text('1 USD = {} TWD'.format(get_mastercard_rate()))
+    update.message.reply_text('USD = {} TWD'.format(get_mastercard_rate()))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -45,13 +45,16 @@ def get_mastercard_rate():
     r = requests.get('https://www.mastercard.us/settlement/currencyrate/fxDate=0000-00-00;transCurr=USD;'
                      'crdhldBillCurr=TWD;bankFee=0;transAmt=1/conversion-rate',
                      headers=headers)
+    logger.info(r.text)
     obj = json.loads(r.text)
+    logger.info(obj['data'])
+    logger.info(obj['data']['conversionRate'])
     return obj['data']['conversionRate']
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_visa_rate(update: Update, context: CallbackContext):
-    update.message.reply_text('1 USD = {} TWD'.format(get_visa_rate()))
+    update.message.reply_text('USD = {} TWD'.format(get_visa_rate()))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -170,7 +173,7 @@ def get_usdt():
 
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_combine(update: Update, context: CallbackContext):
-    update.message.reply_text('Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD\n{}'.format(get_mastercard_rate(), get_visa_rate(), get_usdt()))
+    update.message.reply_text('{}\n\nCredit Card Rate\nMastercard: USD = {} TWD\nVisa: USD = {} TWD'.format(get_usdt(), get_mastercard_rate(), get_visa_rate()))
 
 
 def main():
