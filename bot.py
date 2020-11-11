@@ -73,12 +73,12 @@ def ask_rate(update: Update, context: CallbackContext):
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_bito(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
-    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    # tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
     price = get_bito_price(utc_now)
     if price > -1:
-        update.message.reply_text('BitoPro {}\nUSDT = {} TWD'.format(tw_time, price))
+        update.message.reply_text('BitoPro\nUSDT = {} TWD'.format(price))
     else:
-        update.message.reply_text('BitoPro {}\n找不到資料'.format(tw_time))
+        update.message.reply_text('BitoPro\n找不到資料')
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
@@ -97,12 +97,12 @@ def get_bito_price(utc_now: datetime):
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_ace(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
-    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    # tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
     price = get_ace_price()
     if price > -1:
-        update.message.reply_text('Ace {}\nUSDT = {} TWD'.format(tw_time, price))
+        update.message.reply_text('Ace\nUSDT = {} TWD'.format(price))
     else:
-        update.message.reply_text('Ace {}\n找不到資料'.format(tw_time, price))
+        update.message.reply_text('Ace\n找不到資料')
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
@@ -119,17 +119,16 @@ def get_ace_price():
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_max(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
-    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+    # tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
     price = get_max_price()
     if price > -1:
-        update.message.reply_text('Max {}\nUSDT = {} TWD'.format(tw_time, price))
+        update.message.reply_text('Max\nUSDT = {} TWD'.format(price))
     else:
-        update.message.reply_text('Max {}\n找不到資料'.format(tw_time, price))
+        update.message.reply_text('Max\n找不到資料')
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
 def get_max_price():
-    logger.info('get max price')
     headers = {'authority': 'max.maicoin.com',
                'pragma': 'no-cache',
                'cache-control': 'no-cache',
@@ -147,9 +146,7 @@ def get_max_price():
     r = requests.get(
         'https://max.maicoin.com/trades/usdttwd/recent_trades',
         headers=headers)
-    logger.info('get body:{}'.format(r.text))
     obj = json.loads(r.text)
-    logger.info(obj)
     if not obj['data']:
         return -1
     else:
@@ -158,18 +155,22 @@ def get_max_price():
 
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_usdt(update: Update, context: CallbackContext):
+    update.message.reply_text(get_usdt())
+
+
+@cache.memoize(ttl=3 * 60, typed=True)
+def get_usdt():
     utc_now = datetime.now(timezone.utc)
-    logger.info(utc_now)
-    tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(tw_time)
+    # tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
     bito_price = get_bito_price(utc_now)
-    logger.info(bito_price)
     ace_price = get_ace_price()
-    logger.info(ace_price)
     max_price = get_max_price()
-    logger.info(max_price)
-    update.message.reply_text('USDT Price {}\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD'
-                              .format(tw_time, bito_price, ace_price, max_price))
+    return 'USDT Price\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD'.format(bito_price, ace_price, max_price)
+
+
+@cache.memoize(ttl=3 * 60, typed=True)
+def ask_combine(update: Update, context: CallbackContext):
+    update.message.reply_text('Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD\n{}'.format(get_mastercard_rate(), get_visa_rate(), get_usdt()))
 
 
 def main():
@@ -189,6 +190,7 @@ def main():
     dp.add_handler(CommandHandler('u', ask_usdt))
     dp.add_handler(CommandHandler('ust', ask_usdt))
     dp.add_handler(CommandHandler('usdt', ask_usdt))
+    dp.add_handler(CommandHandler('howdoyouturnthison', ask_combine))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
