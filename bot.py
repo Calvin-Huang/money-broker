@@ -5,7 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 from cacheout import Cache
 from datetime import datetime, timedelta, timezone
-from flask import Flask
 from telegram import Update
 from telegram.ext import (
     Updater,
@@ -177,15 +176,7 @@ def ask_combine(update: Update, context: CallbackContext):
     update.message.reply_text('{}\n\nCredit Card Rate\nMastercard: USD = {} TWD\nVisa: USD = {} TWD'.format(get_usdt(), get_mastercard_rate(), get_visa_rate()))
 
 
-app = Flask(__name__)
-
-@app.route('/ping')
-def pong():
-    return 'pong'
-
-
 def main():
-    app.run()
     logger.info('Token = {}'.format(TOKEN))
     updater = Updater(TOKEN)
     dp = updater.dispatcher
