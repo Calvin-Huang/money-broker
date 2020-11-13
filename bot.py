@@ -2,9 +2,10 @@ import json
 import logging
 import os
 import requests
-from datetime import datetime, timedelta, timezone
-from cacheout import Cache
 from bs4 import BeautifulSoup
+from cacheout import Cache
+from datetime import datetime, timedelta, timezone
+from flask import Flask
 from telegram import Update
 from telegram.ext import (
     Updater,
@@ -171,12 +172,20 @@ def get_usdt():
     return 'USDT Price\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD'.format(bito_price, ace_price, max_price)
 
 
-@cache.memoize(ttl=3 * 60, typed=True)
+@cache.memoize(ttl=60 * 60 * 4, typed=True)
 def ask_combine(update: Update, context: CallbackContext):
     update.message.reply_text('{}\n\nCredit Card Rate\nMastercard: USD = {} TWD\nVisa: USD = {} TWD'.format(get_usdt(), get_mastercard_rate(), get_visa_rate()))
 
 
+app = Flask(__name__)
+
+@app.route('/ping')
+def pong():
+    return 'pong'
+
+
 def main():
+    app.run()
     logger.info('Token = {}'.format(TOKEN))
     updater = Updater(TOKEN)
     dp = updater.dispatcher
