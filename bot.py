@@ -206,8 +206,9 @@ def get_mastercard_rate_from_3rd():
     # rate = [i.text for i in soup.select(selector)][0]    
 
     root = html.fromstring(r.content)
-    logger.info([x for x in root.xpath('/html/body/div/div[4]/div/div/div[2]/div/div[2]/div/div/div[2]/div/table/tbody/tr[1]/td[2]')])    
-    rate = [x for x in root.xpath('/html/body/div/div[4]/div/div/div[2]/div/div[2]/div/div/div[2]/div/table/tbody/tr[1]/td[2]')][0]
+    logger.info(r.content)
+    logger.info([x for x in root.xpath('//*[@id="table_comparison"]/tbody/tr[1]/td[2]')])    
+    rate = [x for x in root.xpath('//*[@id="table_comparison"]/tbody/tr[1]/td[2]')][0]
     return rate.replace('\xa0','').strip('0')
 
 
