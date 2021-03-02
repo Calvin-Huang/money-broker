@@ -193,7 +193,7 @@ def ask_ust(update: Update, context: CallbackContext):
     update.message.reply_text('Mirror Wallet UST = {} USD'.format(get_ust()))
 
 
-def get_mastercard_rate_from_3rd()
+def get_mastercard_rate_from_3rd():
     r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
     soup = BeautifulSoup(r.text, 'html.parser')
     selector = '#table_comparison > tbody > tr:nth-child(1) > td:nth-child(2)'
@@ -201,7 +201,7 @@ def get_mastercard_rate_from_3rd()
     return rate
 
 
-def get_visa_rate_from_3rd()
+def get_visa_rate_from_3rd():
     r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
     soup = BeautifulSoup(r.text, 'html.parser')
     selector = '#comparison_huilv_Visa'
@@ -214,7 +214,7 @@ def ask_jcb_rate(update: Update, context: CallbackContext):
     update.message.reply_text('USD = {} TWD'.format(get_jcb_rate_from_3rd()))
 
 
-def get_jcb_rate_from_3rd()
+def get_jcb_rate_from_3rd():
     r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
     soup = BeautifulSoup(r.text, 'html.parser')
     selector = '#comparison_huilv_JCB'
