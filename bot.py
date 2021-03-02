@@ -27,7 +27,7 @@ def error(update, context):
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_mastercard_rate(update: Update, context: CallbackContext):
-    update.message.reply_text('USD = {} TWD'.format(get_mastercard_rate()))
+    update.message.reply_text('USD = {} TWD'.format(get_mastercard_rate_from_3rd()))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -58,7 +58,7 @@ def get_mastercard_rate():
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_visa_rate(update: Update, context: CallbackContext):
-    update.message.reply_text('USD = {} TWD'.format(get_visa_rate()))
+    update.message.reply_text('USD = {} TWD'.format(get_visa_rate_from_3rd()))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -76,7 +76,7 @@ def get_visa_rate():
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_rate(update: Update, context: CallbackContext):
     update.message.reply_text(
-        'Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(get_mastercard_rate(), get_visa_rate()))
+        'Mastercard: 1 USD = {} TWD\nVisa: 1 USD = {} TWD'.format(get_mastercard_rate_from_3rd(), get_visa_rate_from_3rd()))
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
@@ -179,7 +179,7 @@ def get_usdt():
 
 @cache.memoize(ttl=60 * 60 * 4, typed=True)
 def ask_combine(update: Update, context: CallbackContext):
-    update.message.reply_text('{}\n\nCredit Card Rate\nMastercard: USD = {} TWD\nVisa: USD = {} TWD'.format(get_usdt(), get_mastercard_rate(), get_visa_rate()))
+    update.message.reply_text('{}\n\nCredit Card Rate\nMastercard: USD = {} TWD\nVisa: USD = {} TWD\nJCB: USD = {} TWD'.format(get_usdt(), get_mastercard_rate_from_3rd(), get_visa_rate_from_3rd(), get_jcb_rate_from_3rd()))
 
 
 def get_ust():
@@ -191,6 +191,35 @@ def get_ust():
 
 def ask_ust(update: Update, context: CallbackContext):
     update.message.reply_text('Mirror Wallet UST = {} USD'.format(get_ust()))
+
+
+def get_mastercard_rate_from_3rd()
+    r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
+    soup = BeautifulSoup(r.text, 'html.parser')
+    selector = '#table_comparison > tbody > tr:nth-child(1) > td:nth-child(2)'
+    rate = [i.text for i in soup.select(selector)][0]
+    return rate
+
+
+def get_visa_rate_from_3rd()
+    r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
+    soup = BeautifulSoup(r.text, 'html.parser')
+    selector = '#comparison_huilv_Visa'
+    rate = [i.text for i in soup.select(selector)][0]
+    return rate
+
+
+@cache.memoize(ttl=10 * 60, typed=True)
+def ask_jcb_rate(update: Update, context: CallbackContext):
+    update.message.reply_text('USD = {} TWD'.format(get_jcb_rate_from_3rd()))
+
+
+def get_jcb_rate_from_3rd()
+    r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
+    soup = BeautifulSoup(r.text, 'html.parser')
+    selector = '#comparison_huilv_JCB'
+    rate = [i.text for i in soup.select(selector)][0]
+    return rate.replace('\xa0','')
 
 
 def main():
@@ -211,6 +240,7 @@ def main():
     dp.add_handler(CommandHandler('usdt', ask_usdt))
     dp.add_handler(CommandHandler('howdoyouturnthison', ask_combine))
     dp.add_handler(CommandHandler('ust', ask_ust))
+    dp.add_handler(CommandHandler('jcb', ask_jcb_rate))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
