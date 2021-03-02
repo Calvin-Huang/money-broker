@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from cacheout import Cache
 from datetime import datetime, timedelta, timezone
 from telegram import Update
+from lxml import html
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -195,14 +196,17 @@ def ask_ust(update: Update, context: CallbackContext):
 
 def get_mastercard_rate_from_3rd():
     r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
-    soup = BeautifulSoup(r.text, 'html.parser')
-    logger.info(r.text)
-    selector = '#table_comparison > tbody > tr:nth-child(1) > td:nth-child(2)'
-    logger.info(soup.select('#table_comparison'))
-    logger.info(soup.select('#table_comparison > tbody'))
-    logger.info(soup.select('#table_comparison > tbody > tr:nth-child(1)'))
-    logger.info(soup.select(selector))
-    rate = [i.text for i in soup.select(selector)][0]    
+    # soup = BeautifulSoup(r.text, 'html.parser')
+    # logger.info(r.text)
+    # selector = '#table_comparison > tbody > tr:nth-child(1) > td:nth-child(2)'
+    # logger.info(soup.select('#table_comparison'))
+    # logger.info(soup.select('#table_comparison > tbody'))
+    # logger.info(soup.select('#table_comparison > tbody > tr:nth-child(1)'))
+    # logger.info(soup.select(selector))
+    # rate = [i.text for i in soup.select(selector)][0]    
+
+    root = html.fromstring(r.content)
+    rate = root.xpath('/html/body/div/div[4]/div/div/div[2]/div/div[2]/div/div/div[2]/div/table/tbody/tr[1]/td[2]')
     return rate.replace('\xa0','')
 
 
