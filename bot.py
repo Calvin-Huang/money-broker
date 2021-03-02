@@ -180,7 +180,7 @@ def get_usdt():
 
 @cache.memoize(ttl=60 * 60 * 4, typed=True)
 def ask_combine(update: Update, context: CallbackContext):
-    update.message.reply_text('{}\n\nCredit Card Rate\nMastercard: USD = {} TWD\nVisa: USD = {} TWD\nJCB: USD = {} TWD'.format(get_usdt(), get_mastercard_rate_from_3rd(), get_visa_rate_from_3rd(), get_jcb_rate_from_3rd()))
+    update.message.reply_text('{}\n\nUSD Credit Card Rate\nMastercard: {} TWD\nVisa: {} TWD\nJCB: {} TWD'.format(get_usdt(), get_mastercard_rate_from_3rd(), get_visa_rate_from_3rd(), get_jcb_rate_from_3rd()))
 
 
 def get_ust():
