@@ -198,6 +198,9 @@ def get_mastercard_rate_from_3rd():
     soup = BeautifulSoup(r.text, 'html.parser')
     logger.info(r.text)
     selector = '#table_comparison > tbody > tr:nth-child(1) > td:nth-child(2)'
+    logger.info(soup.select('#table_comparison'))
+    logger.info(soup.select('#table_comparison > tbody'))
+    logger.info(soup.select('#table_comparison > tbody > tr:nth-child(1)'))
     logger.info(soup.select(selector))
     rate = [i.text for i in soup.select(selector)][0]    
     return rate.replace('\xa0','')
