@@ -196,19 +196,16 @@ def ask_ust(update: Update, context: CallbackContext):
 
 def get_mastercard_rate_from_3rd():
     r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
-    # soup = BeautifulSoup(r.text, 'html.parser')
-    # logger.info(r.text)
-    # selector = '#table_comparison > tbody > tr:nth-child(1) > td:nth-child(2)'
-    # logger.info(soup.select('#table_comparison'))
-    # logger.info(soup.select('#table_comparison > tbody'))
-    # logger.info(soup.select('#table_comparison > tbody > tr:nth-child(1)'))
-    # logger.info(soup.select(selector))
-    # rate = [i.text for i in soup.select(selector)][0]    
+    soup = BeautifulSoup(r.text, 'html.parser')
+    logger.info(r.text)
+    selector = 'body > div > div:nth-child(3) > div > div > div.panel-body > div:nth-child(4) > div.col-md-10.col-xs-7 > b'
+    logger.info(soup.select(selector))
+    rate = [i.text for i in soup.select(selector)][0]
 
-    root = html.fromstring(r.content)
-    logger.info(r.content)
-    logger.info([x for x in root.xpath('//*[@id="table_comparison"]/tbody/tr[1]/td[2]')])    
-    rate = [x for x in root.xpath('//*[@id="table_comparison"]/tbody/tr[1]/td[2]')][0]
+    # root = html.fromstring(r.content)
+    # logger.info(r.content)
+    # logger.info([x for x in root.xpath('//*[@id="table_comparison"]/tbody/tr[1]/td[2]')])    
+    # rate = [x for x in root.xpath('//*[@id="table_comparison"]/tbody/tr[1]/td[2]')][0]
     return rate.replace('\xa0','').strip('0')
 
 
