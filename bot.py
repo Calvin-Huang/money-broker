@@ -197,9 +197,9 @@ def ask_ust(update: Update, context: CallbackContext):
 def get_mastercard_rate_from_3rd():
     r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
     soup = BeautifulSoup(r.text, 'html.parser')
-    logger.info(r.text)
+    # logger.info(r.text)
     selector = 'body > div > div:nth-child(3) > div > div > div.panel-body > div:nth-child(4) > div.col-md-10.col-xs-7 > b'
-    logger.info(soup.select(selector))
+    # logger.info(soup.select(selector))
     rate = [i.text for i in soup.select(selector)][0]
 
     # root = html.fromstring(r.content)
