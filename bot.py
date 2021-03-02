@@ -14,6 +14,7 @@ from telegram.ext import (
 APPNAME = os.environ["APPNAME"]
 PORT = int(os.environ.get('PORT', '8443'))
 TOKEN = os.environ["TOKEN"]
+MOONPAYKEY = os.environ["MOONPAYKEY"]
 cache = Cache()
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -31,25 +32,28 @@ def ask_mastercard_rate(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def get_mastercard_rate():
-    headers = {'authority': 'www.mastercard.us',
-               'pragma': 'no-cache',
-               'cache-control': 'no-cache',
-               'accept': 'application/json, text/plain, */*',
-               'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                             'Chrome/86.0.4240.183 Safari/537.36',
-               'sec-fetch-site': 'same-origin',
-               'sec-fetch-mode': 'cors',
-               'sec-fetch-dest': 'empty',
-               'referer': 'https://www.mastercard.us/en-us/personal/get-support/convert-currency.html',
-               'accept-language': 'en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7'}
-    r = requests.get('https://www.mastercard.us/settlement/currencyrate/fxDate=0000-00-00;transCurr=USD;'
-                     'crdhldBillCurr=TWD;bankFee=0;transAmt=1/conversion-rate',
-                     headers=headers)
-    logger.info(r.text)
-    obj = json.loads(r.text)
-    logger.info(obj['data'])
-    logger.info(obj['data']['conversionRate'])
-    return obj['data']['conversionRate']
+    try:
+        headers = {'authority': 'www.mastercard.us',
+                'pragma': 'no-cache',
+                'cache-control': 'no-cache',
+                'accept': 'application/json, text/plain, */*',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                'Chrome/86.0.4240.183 Safari/537.36',
+                'sec-fetch-site': 'same-origin',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-dest': 'empty',
+                'referer': 'https://www.mastercard.us/en-us/personal/get-support/convert-currency.html',
+                'accept-language': 'en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7'}
+        r = requests.get('https://www.mastercard.us/settlement/currencyrate/fxDate=0000-00-00;transCurr=USD;'
+                        'crdhldBillCurr=TWD;bankFee=0;transAmt=1/conversion-rate',
+                        headers=headers)
+        logger.info(r.text)
+        obj = json.loads(r.text)
+        logger.info(obj['data'])
+        logger.info(obj['data']['conversionRate'])
+        return obj['data']['conversionRate']
+    except:
+        return '??'
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -59,13 +63,15 @@ def ask_visa_rate(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def get_visa_rate():
-    r = requests.get(
-        'https://www.visa.com.tw/travel-with-visa/exchange-rate-calculator.html?fromCurr=TWD&toCurr=USD&fee=0')
-    soup = BeautifulSoup(r.text, 'html.parser')
-    selector = 'span strong+ strong'
-    rate = [i.text for i in soup.select(selector)][0]
-    return rate
-
+    try:
+        r = requests.get(
+            'https://www.visa.com.tw/travel-with-visa/exchange-rate-calculator.html?fromCurr=TWD&toCurr=USD&fee=0')
+        soup = BeautifulSoup(r.text, 'html.parser')
+        selector = 'span strong+ strong'
+        rate = [i.text for i in soup.select(selector)][0]
+        return rate
+    except:
+        return '??'
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_rate(update: Update, context: CallbackContext):
@@ -176,6 +182,17 @@ def ask_combine(update: Update, context: CallbackContext):
     update.message.reply_text('{}\n\nCredit Card Rate\nMastercard: USD = {} TWD\nVisa: USD = {} TWD'.format(get_usdt(), get_mastercard_rate(), get_visa_rate()))
 
 
+def get_ust():
+    r = requests.get(
+            'https://api.moonpay.io/v3/currencies/ask_price?cryptoCurrencies=ust&fiatCurrencies=twd,usd&apiKey={}'.format(MOONPAYKEY))
+    obj = json.loads(r.text)
+    return obj['UST']['USD']
+
+
+def ask_ust(update: Update, context: CallbackContext):
+    update.message.reply_text('Mirror Wallet UST = {} USD'.format(get_ust()))
+
+
 def main():
     logger.info('Token = {}'.format(TOKEN))
     updater = Updater(TOKEN)
@@ -191,9 +208,9 @@ def main():
     dp.add_handler(CommandHandler('ace', ask_ace))
     dp.add_handler(CommandHandler('max', ask_max))
     dp.add_handler(CommandHandler('u', ask_usdt))
-    dp.add_handler(CommandHandler('ust', ask_usdt))
     dp.add_handler(CommandHandler('usdt', ask_usdt))
     dp.add_handler(CommandHandler('howdoyouturnthison', ask_combine))
+    dp.add_handler(CommandHandler('ust', ask_ust))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
