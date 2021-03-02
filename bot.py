@@ -5,7 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 from cacheout import Cache
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal
 from telegram import Update
 from lxml import html
 from telegram.ext import (
@@ -209,7 +208,7 @@ def get_mastercard_rate_from_3rd():
     root = html.fromstring(r.content)
     logger.info([x for x in root.xpath('/html/body/div/div[4]/div/div/div[2]/div/div[2]/div/div/div[2]/div/table/tbody/tr[1]/td[2]')])    
     rate = [x for x in root.xpath('/html/body/div/div[4]/div/div/div[2]/div/div[2]/div/div/div[2]/div/table/tbody/tr[1]/td[2]')][0]
-    return Decimal(rate.replace('\xa0',''))
+    return rate.replace('\xa0','').strip('0')
 
 
 def get_visa_rate_from_3rd():
@@ -217,7 +216,7 @@ def get_visa_rate_from_3rd():
     soup = BeautifulSoup(r.text, 'html.parser')
     selector = '#comparison_huilv_Visa'
     rate = [i.text for i in soup.select(selector)][0]
-    return Decimal(rate)
+    return rate.strip('0')
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -230,7 +229,7 @@ def get_jcb_rate_from_3rd():
     soup = BeautifulSoup(r.text, 'html.parser')
     selector = '#comparison_huilv_JCB'
     rate = [i.text for i in soup.select(selector)][0]
-    return Decimal(rate)
+    return rate.strip('0')
 
 
 def main():
