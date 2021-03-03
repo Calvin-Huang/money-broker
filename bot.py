@@ -139,7 +139,7 @@ def get_usd_rete_from_3rd():
 
 
 def get_usd_rate():
-    return 'USD Rate\nMastercard: {} TWD\nVisa: {} TWD\nJCB: {} TWD'.format(get_usdt(), get_usd_rete_from_3rd()[0], get_usd_rete_from_3rd()[1], get_usd_rete_from_3rd()[2])
+    return 'USD Rate\nMastercard: {} TWD\nVisa: {} TWD\nJCB: {} TWD'.format(get_usd_rete_from_3rd()[0], get_usd_rete_from_3rd()[1], get_usd_rete_from_3rd()[2])
 
 
 def get_ace_price():
