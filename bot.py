@@ -130,7 +130,7 @@ def get_usd_rate_test():
             logger.info('obj["d"] "%s"', obj['d'])
             rates = json.loads(obj['d'])
             logger.info('rates "%s"', rates)
-            usd = [datum for datum in rates if datum['Name'] == '美元']
+            usd = list(filter(lambda f: (f["Name"] == "美元"), rates))
             return float(usd['BBoardRate'])
     except Exception as e:
         logger.info('except "%s"', e)
