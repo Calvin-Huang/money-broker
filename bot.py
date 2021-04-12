@@ -206,12 +206,12 @@ def get_usdt():
     else:
         bito_price = bito_price + ' TWD'
     ace_price = str(get_ace_price())
-    if ace_price == '-1'
+    if ace_price == '-1':
         ace_price = '死了(?)'
     else:
         ace_price = ace_price + ' TWD'
     max_price = str(get_max_price())
-    if max_price == '-1'
+    if max_price == '-1':
         max_price = '死了(?)'
     else:
         max_price = max_price + ' TWD'
