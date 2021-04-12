@@ -53,7 +53,7 @@ def ask_ace(update: Update, context: CallbackContext):
     if price > -1:
         update.message.reply_text('Ace\nUSDT = {} TWD'.format(price))
     else:
-        update.message.reply_text('Ace\n找不到資料')
+        update.message.reply_text('Ace\n找不到資料(可能死了)')
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
@@ -64,7 +64,7 @@ def ask_bito(update: Update, context: CallbackContext):
     if price > -1:
         update.message.reply_text('BitoPro\nUSDT = {} TWD'.format(price))
     else:
-        update.message.reply_text('BitoPro\n找不到資料')
+        update.message.reply_text('BitoPro\n找不到資料(可能死了)')
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
@@ -74,7 +74,7 @@ def ask_max(update: Update, context: CallbackContext):
     if price > -1:
         update.message.reply_text('Max\nUSDT = {} TWD'.format(price))
     else:
-        update.message.reply_text('Max\n找不到資料')
+        update.message.reply_text('Max\n找不到資料(可能死了)')
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
@@ -143,50 +143,59 @@ def get_usd_rate():
 
 
 def get_ace_price():
-    r = requests.get(
+    try:
+        r = requests.get(
         'https://www.ace.io/polarisex/quote/getKline?baseCurrencyId=1&tradeCurrencyId=14&limit=1')
-    obj = json.loads(r.text)
-    if not obj['attachment']:
+        obj = json.loads(r.text)
+        if not obj['attachment']:
+            return -1
+        else:
+            return float(obj['attachment'][0]['closePrice'])
+    except:
         return -1
-    else:
-        return float(obj['attachment'][0]['closePrice'])
 
 
 def get_bito_price(utc_now: datetime):
-    to_time = int(utc_now.timestamp())
-    from_time = int((utc_now - timedelta(seconds=1800)).timestamp())
-    r = requests.get(
-        'https://api.bitopro.com/v3/trading-history/usdt_twd?resolution=1m&from={}&to={}'.format(from_time, to_time))
-    obj = json.loads(r.text)
-    if obj['data'] is None:
+    try:
+        to_time = int(utc_now.timestamp())
+        from_time = int((utc_now - timedelta(seconds=1800)).timestamp())
+        r = requests.get(
+            'https://api.bitopro.com/v3/trading-history/usdt_twd?resolution=1m&from={}&to={}'.format(from_time, to_time))
+        obj = json.loads(r.text)
+        if obj['data'] is None:
+            return -1
+        else:
+            return float(obj['data'][0]['close'])
+    except:
         return -1
-    else:
-        return float(obj['data'][0]['close'])
 
 
 def get_max_price():
-    headers = {'authority': 'max.maicoin.com',
-               'pragma': 'no-cache',
-               'cache-control': 'no-cache',
-               'dnt': '1',
-               'upgrade-insecure-requests': '1',
-               'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,'
-                         '*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-               'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                             'Chrome/86.0.4240.183 Safari/537.36',
-               'sec-fetch-site': 'none',
-               'sec-fetch-mode': 'navigate',
-               'sec-fetch-user': '?1',
-               'sec-fetch-dest': 'document',
-               'accept-language': 'en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7'}
-    r = requests.get(
-        'https://max.maicoin.com/trades/usdttwd/recent_trades',
-        headers=headers)
-    obj = json.loads(r.text)
-    if not obj['data']:
+    try:
+        headers = {'authority': 'max.maicoin.com',
+                'pragma': 'no-cache',
+                'cache-control': 'no-cache',
+                'dnt': '1',
+                'upgrade-insecure-requests': '1',
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,'
+                            '*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                'Chrome/86.0.4240.183 Safari/537.36',
+                'sec-fetch-site': 'none',
+                'sec-fetch-mode': 'navigate',
+                'sec-fetch-user': '?1',
+                'sec-fetch-dest': 'document',
+                'accept-language': 'en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7'}
+        r = requests.get(
+            'https://max.maicoin.com/trades/usdttwd/recent_trades',
+            headers=headers)
+        obj = json.loads(r.text)
+        if not obj['data']:
+            return -1
+        else:
+            return float(obj['data'][0]['price'])
+    except:
         return -1
-    else:
-        return float(obj['data'][0]['price'])
 
 
 def get_usdt():
