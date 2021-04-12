@@ -200,10 +200,22 @@ def get_max_price():
 
 def get_usdt():
     utc_now = datetime.now(timezone.utc)
-    bito_price = get_bito_price(utc_now)
-    ace_price = get_ace_price()
-    max_price = get_max_price()
-    return 'USDT Price\nBitoPro: {} TWD\nAce: {} TWD\nMax: {} TWD'.format(bito_price, ace_price, max_price)
+    bito_price = str(get_bito_price(utc_now))
+    if bito_price == '-1':
+        bito_price = '死了(?)'
+    else:
+        bito_price = bito_price + ' TWD'
+    ace_price = str(get_ace_price())
+    if ace_price == '-1'
+        ace_price = '死了(?)'
+    else:
+        ace_price = ace_price + ' TWD'
+    max_price = str(get_max_price())
+    if max_price == '-1'
+        max_price = '死了(?)'
+    else:
+        max_price = max_price + ' TWD'
+    return 'USDT Price\nBitoPro: {}\nAce: {}\nMax: {}'.format(bito_price, ace_price, max_price)
 
 
 def get_ust():
