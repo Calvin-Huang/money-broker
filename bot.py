@@ -119,7 +119,7 @@ def get_usd_rate_test():
         r = requests.post(
             'https://www.esunbank.com.tw/bank/Layouts/esunbank/Deposit/DpService.aspx/GetForeignExchageRate',
             headers=headers,
-            json={'day'= dayStr, 'time' = timeStr})
+            json={'day':dayStr,'time':timeStr})
         obj = json.loads(r.text)
         if not obj['d']:
             return -1
