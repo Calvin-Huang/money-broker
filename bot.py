@@ -132,8 +132,8 @@ def get_usd_rate_test():
             logger.info('rates "%s"', rates)
             usd = [datum for datum in rates if datum['Name'] == '美元']
             return float(usd['BBoardRate'])
-    except:
-        logger.info('except')
+    except Exception as e:
+        logger.info('except "%s"', e)
         return -2
     return 
 
