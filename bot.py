@@ -113,7 +113,6 @@ def get_usd_rate_test():
     try:
         dayStr = (datetime.now(timezone.utc) + timedelta(hours = 8)).strftime('%Y-%m-%d')
         timeStr = (datetime.now(timezone.utc) + timedelta(hours = 8)).strftime('%H:%M:%S')
-        logger.info('dayStr "%s", timeStr "%s"', dayStr, timeStr)
         headers = {'Content-Type': 'application/json',
                 'Referer': 'https://www.esunbank.com.tw/bank/personal/deposit/rate/forex/foreign-exchange-rates',
                 'Host': 'www.esunbank.com.tw'}
@@ -122,16 +121,13 @@ def get_usd_rate_test():
             headers=headers,
             json={'day':dayStr,'time':timeStr})
         obj = json.loads(r.text)
-        logger.info('r.text "%s"', r.text)
-        if not obj['d']:
-            logger.info('not obj[d]')
+        if not obj['d']:            
             return -1
         else:
-            logger.info('obj["d"] "%s"', obj['d'])
             rates = json.loads(obj['d'])
-            logger.info('rates "%s"', rates)
-            usd = list(filter(lambda f: (f["Name"] == "美元"), rates))
-            return usd['BBoardRate']
+            #logger.info('rates "%s"', rates)
+            result = rates[0]['BBoardRate']
+            return result
     except Exception as e:
         logger.info('except "%s"', e)
         return -2
