@@ -45,6 +45,10 @@ def ask_jcb_rate(update: Update, context: CallbackContext):
 def ask_usd_rate(update: Update, context: CallbackContext):
     update.message.reply_text(get_usd_rate())
 
+@cache.memoize(ttl=10 * 60, typed=True)
+def ask_usd_rate_test(update: Update, context: CallbackContext):
+    update.message.reply_text('玉山買入USD = {} TWD'.format(get_usd_rate_test()))
+
 
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_ace(update: Update, context: CallbackContext):
@@ -92,43 +96,6 @@ def ask_ust(update: Update, context: CallbackContext):
     update.message.reply_text('Mirror Wallet UST = {} USD'.format(get_ust()))
 
 
-# def get_mastercard_rate():
-#     try:
-#         headers = {'authority': 'www.mastercard.us',
-#                 'pragma': 'no-cache',
-#                 'cache-control': 'no-cache',
-#                 'accept': 'application/json, text/plain, */*',
-#                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-#                                 'Chrome/86.0.4240.183 Safari/537.36',
-#                 'sec-fetch-site': 'same-origin',
-#                 'sec-fetch-mode': 'cors',
-#                 'sec-fetch-dest': 'empty',
-#                 'referer': 'https://www.mastercard.us/en-us/personal/get-support/convert-currency.html',
-#                 'accept-language': 'en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7'}
-#         r = requests.get('https://www.mastercard.us/settlement/currencyrate/fxDate=0000-00-00;transCurr=USD;'
-#                         'crdhldBillCurr=TWD;bankFee=0;transAmt=1/conversion-rate',
-#                         headers=headers)
-#         logger.info(r.text)
-#         obj = json.loads(r.text)
-#         logger.info(obj['data'])
-#         logger.info(obj['data']['conversionRate'])
-#         return obj['data']['conversionRate']
-#     except:
-#         return '??'
-# 
-# 
-# def get_visa_rate():
-#     try:
-#         r = requests.get(
-#             'https://www.visa.com.tw/travel-with-visa/exchange-rate-calculator.html?fromCurr=TWD&toCurr=USD&fee=0')
-#         soup = BeautifulSoup(r.text, 'html.parser')
-#         selector = 'span strong+ strong'
-#         rate = [i.text for i in soup.select(selector)][0]
-#         return rate
-#     except:
-#         return '??'
-
-
 def get_usd_rete_from_3rd():
     r = requests.get('https://www.bestxrate.com/card/mastercard/usd.html')
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -140,6 +107,29 @@ def get_usd_rete_from_3rd():
 
 def get_usd_rate():
     return 'USD Rate\nMastercard: {} TWD\nVisa: {} TWD\nJCB: {} TWD'.format(get_usd_rete_from_3rd()[0], get_usd_rete_from_3rd()[1], get_usd_rete_from_3rd()[2])
+
+
+def get_usd_rate_test():    
+    try:
+        dayStr = (datetime.now(timezone.utc) + timedelta(hours = 8)).strftime('%Y-%m-%d')
+        timeStr = (datetime.now(timezone.utc) + timedelta(hours = 8)).strftime('%H:%M:%S')
+        headers = {'Content-Type': 'application/json',
+                'Referer': 'https://www.esunbank.com.tw/bank/personal/deposit/rate/forex/foreign-exchange-rates',
+                'Host': 'www.esunbank.com.tw'}
+        r = requests.post(
+            'https://www.esunbank.com.tw/bank/Layouts/esunbank/Deposit/DpService.aspx/GetForeignExchageRate',
+            headers=headers,
+            json={'day'= dayStr, 'time' = timeStr})
+        obj = json.loads(r.text)
+        if not obj['d']:
+            return -1
+        else:
+            obj = json.loads(obj['d'])
+            usd = [datum for datum in obj['Rates'] if datum['Name'] == '美元']
+            return float(usd['BBoardRate'])
+    except:
+        return -1
+    return 
 
 
 def get_ace_price():
@@ -245,6 +235,7 @@ def main():
     dp.add_handler(CommandHandler('usdt', ask_usdt))
     dp.add_handler(CommandHandler('howdoyouturnthison', ask_combine))
     dp.add_handler(CommandHandler('ust', ask_ust))
+    dp.add_handler(CommandHandler('test', ask_usd_rate_test))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
