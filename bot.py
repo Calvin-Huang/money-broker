@@ -128,8 +128,9 @@ def get_usd_rate_test():
             return -1
         else:
             logger.info('obj["d"] "%s"', obj['d'])
-            obj = json.loads(obj['d'])
-            usd = [datum for datum in obj['Rates'] if datum['Name'] == '美元']
+            rates = json.loads(obj['d'])
+            logger.info('rates "%s"', rates)
+            usd = [datum for datum in rates if datum['Name'] == '美元']
             return float(usd['BBoardRate'])
     except:
         logger.info('except')
