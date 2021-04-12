@@ -47,7 +47,7 @@ def ask_usd_rate(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_usd_rate_test(update: Update, context: CallbackContext):
-    update.message.reply_text('玉山買入USD = {} TWD'.format(get_usd_rate_test()))
+    update.message.reply_text('玉山買入USD = {} TWD'.format(get_usd_rate_esunbank()))
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
@@ -109,7 +109,7 @@ def get_usd_rate():
     return 'USD Rate\nMastercard: {} TWD\nVisa: {} TWD\nJCB: {} TWD'.format(get_usd_rete_from_3rd()[0], get_usd_rete_from_3rd()[1], get_usd_rete_from_3rd()[2])
 
 
-def get_usd_rate_test():    
+def get_usd_rate_esunbank():
     try:
         dayStr = (datetime.now(timezone.utc) + timedelta(hours = 8)).strftime('%Y-%m-%d')
         timeStr = (datetime.now(timezone.utc) + timedelta(hours = 8)).strftime('%H:%M:%S')
@@ -130,7 +130,7 @@ def get_usd_rate_test():
             return result
     except Exception as e:
         logger.info('except "%s"', e)
-        return -2
+        return -1
     return 
 
 
