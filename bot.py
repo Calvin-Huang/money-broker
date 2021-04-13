@@ -125,7 +125,7 @@ def get_usd_rate_esunbank():
             return -1
         else:
             rates = json.loads(obj['d'])
-            #logger.info('rates "%s"', rates)
+            logger.info('rates "%s"', rates)
             logger.info('rates[0] "%s"', rates[0])
             result = rates[0]['BBoardRate']
             return result
