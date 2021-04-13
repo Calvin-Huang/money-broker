@@ -129,7 +129,7 @@ def get_usd_rate_esunbank():
             result = rates[0]['BBoardRate']
             return result
     except Exception as e:
-        logger.info('except "%s"', e)
+        logger.info('except "%s"', e.msg)
         return -1
     return 
 
