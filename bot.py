@@ -46,7 +46,7 @@ def ask_usd_rate(update: Update, context: CallbackContext):
     update.message.reply_text(get_usd_rate())
 
 @cache.memoize(ttl=10 * 60, typed=True)
-def ask_usd_rate_test(update: Update, context: CallbackContext):
+def ask_usd_rate_esunbank(update: Update, context: CallbackContext):
     update.message.reply_text('玉山買入USD = {} TWD'.format(get_usd_rate_esunbank()))
 
 
@@ -106,7 +106,7 @@ def get_usd_rete_from_3rd():
 
 
 def get_usd_rate():
-    return 'USD Rate\nMastercard: {} TWD\nVisa: {} TWD\nJCB: {} TWD'.format(get_usd_rete_from_3rd()[0], get_usd_rete_from_3rd()[1], get_usd_rete_from_3rd()[2])
+    return 'USD Rate\nMastercard: {} TWD\nVisa: {} TWD\nJCB: {} TWD\n玉山買: {} TWD'.format(get_usd_rete_from_3rd()[0], get_usd_rete_from_3rd()[1], get_usd_rete_from_3rd()[2], get_usd_rate_esunbank())
 
 
 def get_usd_rate_esunbank():
@@ -125,10 +125,10 @@ def get_usd_rate_esunbank():
             return -1
         else:
             rates = json.loads(obj['d'])
-            logger.info('rates "%s"', rates)
-            logger.info('rates[rates] "%s"', rates['Rates'])
-            logger.info('rates[rates][0] "%s"', rates['Rates'][0])
-            result = rates['rates'][0]['BBoardRate']
+            #logger.info('rates "%s"', rates)
+            #logger.info('rates[rates] "%s"', rates['Rates'])
+            #logger.info('rates[rates][0] "%s"', rates['Rates'][0])
+            result = rates['Rates'][0]['BBoardRate']
             return result
     except Exception as e:
         logger.info('except "%s"', e)
@@ -239,7 +239,7 @@ def main():
     dp.add_handler(CommandHandler('usdt', ask_usdt))
     dp.add_handler(CommandHandler('howdoyouturnthison', ask_combine))
     dp.add_handler(CommandHandler('ust', ask_ust))
-    dp.add_handler(CommandHandler('test', ask_usd_rate_test))
+    dp.add_handler(CommandHandler('esun', ask_usd_rate_esunbank))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
