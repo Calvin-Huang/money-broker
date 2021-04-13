@@ -126,8 +126,9 @@ def get_usd_rate_esunbank():
         else:
             rates = json.loads(obj['d'])
             logger.info('rates "%s"', rates)
-            logger.info('rates[0] "%s"', rates[0])
-            result = rates[0]['BBoardRate']
+            logger.info('rates[rates] "%s"', rates['rates'])
+            logger.info('rates[rates][0] "%s"', rates['rates'][0])
+            result = rates['rates'][0]['BBoardRate']
             return result
     except Exception as e:
         logger.info('except "%s"', e)
