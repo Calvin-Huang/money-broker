@@ -125,8 +125,12 @@ def get_usd_rate_esunbank():
             return -1
         else:
             rates = json.loads(obj['d'])
-            result = rates['Rates'][0]['BBoardRate']
-            return result
+            #result = rates['Rates'][0]['BBoardRate']
+            result = list(filter(lambda x: x['Name'] == '美元', rates['Rates']))
+            if not result:
+                return -1
+            else:
+                return result[0]['BBoardRate']
     except Exception as e:
         logger.info('except "%s"', e)
         return -1
