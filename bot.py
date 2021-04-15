@@ -230,7 +230,8 @@ def get_ust():
 @cache.memoize(ttl=10, typed=True)
 def get_gas():
     r = requests.get('https://etherscan.io/datasourceHandler?q=gashistoricaldata&draw=1&columns%5B2%5D%5Bdata%5D=safeGasPrice&columns%5B2%5D%5Bsearchable%5D=true&columns%5B2%5D%5Borderable%5D=true&columns%5B2%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B3%5D%5Bdata%5D=proposeGasPrice&columns%5B3%5D%5Bsearchable%5D=true&columns%5B3%5D%5Borderable%5D=true&columns%5B3%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B4%5D%5Bdata%5D=fastGasPrice&order%5B0%5D%5Bcolumn%5D=1&order%5B0%5D%5Bdir%5D=desc&length=10', 
-    headers = {'Host': 'etherscan.io'})
+    headers = {'host': 'etherscan.io', 
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'})
     obj = json.loads(r.text)
     safeGasPrice = sum(map(lambda x: int(x['safeGasPrice'].split(' ')[0]), obj['data']))
     proposeGasPrice = sum(map(lambda x: int(x['proposeGasPrice'].split(' ')[0]), obj['data']))
