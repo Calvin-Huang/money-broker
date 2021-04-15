@@ -30,26 +30,30 @@ def error(update, context):
 
 
 def msg_listener(update: Update, context: CallbackContext):
-    if '?gas' == update.message.text.lower():
-        update.message.reply_text(get_gas())
-    elif '啪' in update.message.text or '沒了' in update.message.text:
-        update.message.reply_sticker('CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E')
-    elif '崩崩' in update.message.text:
-        update.message.reply_sticker('CAACAgIAAxkBAAEBLAVgd-FvoMW8F3nVGqx0nOUyxIF-qAACYQQAAonq5QdmC3mfOHu_3h8E')
-    elif '梭哈' in update.message.text and '/梭哈' != update.message.text:
-        update.message.reply_sticker('CAACAgUAAxkBAAEBLAhgd-Grf4bTcZXHaHLUjOtNZMx3cwACNwQAAhwmkVfJpMRsyVY09B8E')
-    elif update.message.text.startswith('?pcs ') and len(update.message.text.split(' ')) == 2:
-        update.message.reply_text('/swap pancake 1 {} wbnb busd'.format(update.message.text.split(' ')[1]))
-    elif update.message.text.startswith('?uni ') and len(update.message.text.split(' ')) == 2:
-        update.message.reply_text('/swap uni 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
-    elif update.message.text.startswith('?sushi ') and len(update.message.text.split(' ')) == 2:
-        update.message.reply_text('/swap sushi 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
-    elif update.message.text.startswith('?pcs ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
-        update.message.reply_text('/swap pancake {} {} wbnb busd'.format(update.message.text.split(' ')[2], update.message.text.split(' ')[1]))
-    elif update.message.text.startswith('?uni ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
-        update.message.reply_text('/swap uni {} {} weth usdt'.format(update.message.text.split(' ')[2], update.message.text.split(' ')[1]))
-    elif update.message.text.startswith('?sushi ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
-        update.message.reply_text('/swap sushi {} {} weth usdt'.format(update.message.text.split(' ')[2], update.message.text.split(' ')[1]))
+    msg = update.message
+    txt = msg.text.strip()
+    if '?gas' == txt.lower():
+        msg.reply_text(get_gas())
+    elif '啪' in txt or '沒了' in txt:
+        msg.reply_sticker('CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E')
+    elif '崩崩' in txt:
+        msg.reply_sticker('CAACAgIAAxkBAAEBLAVgd-FvoMW8F3nVGqx0nOUyxIF-qAACYQQAAonq5QdmC3mfOHu_3h8E')
+    elif '梭哈' in txt and '/梭哈' != txt:
+        msg.reply_sticker('CAACAgUAAxkBAAEBLAhgd-Grf4bTcZXHaHLUjOtNZMx3cwACNwQAAhwmkVfJpMRsyVY09B8E')
+    elif txt.startswith('?pcs ') and len(txt.split(' ')) == 2:
+        msg.reply_text('/swap pancake 1 {} wbnb busd'.format(txt.split(' ')[1]))
+    elif txt.startswith('?uni ') and len(txt.split(' ')) == 2:
+        msg.reply_text('/swap uni 1 {} weth usdt'.format(txt.split(' ')[1]))
+    elif txt.startswith('?sushi ') and len(txt.split(' ')) == 2:
+        msg.reply_text('/swap sushi 1 {} weth usdt'.format(txt.split(' ')[1]))
+    elif txt.startswith('?pcs ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[2]):
+        msg.reply_text('/swap pancake {} {} wbnb busd'.format(txt.split(' ')[2], txt.split(' ')[1]))
+    elif txt.startswith('?uni ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[2]):
+        msg.reply_text('/swap uni {} {} weth usdt'.format(txt.split(' ')[2], txt.split(' ')[1]))
+    elif txt.startswith('?sushi ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[2]):
+        msg.reply_text('/swap sushi {} {} weth usdt'.format(txt.split(' ')[2], txt.split(' ')[1]))
+    elif txt.startswith('?') and txt.endswith('=') and ('+' in txt or '-' in txt or '*' in txt or '/' in txt):
+        msg.reply_text('={}'.format(eval(txt.split('?')[1].strip().split('=')[0].strip())))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
