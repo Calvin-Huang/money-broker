@@ -32,9 +32,12 @@ def error(update, context):
 def msg_listener(update: Update, context: CallbackContext):
     if '?gas' == update.message.text.lower():
         update.message.reply_text(get_gas())
-    elif '啪' in update.message.text:
+    elif '啪' in update.message.text or '沒了' in update.message.text:
         update.message.reply_sticker('CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E')
-
+    elif '崩崩' in update.message.text:
+        update.message.reply_sticker('CAACAgIAAxkBAAEBLAVgd-FvoMW8F3nVGqx0nOUyxIF-qAACYQQAAonq5QdmC3mfOHu_3h8E')
+    elif '梭哈' in update.message.text:
+        update.message.reply_sticker('CAACAgUAAxkBAAEBLAhgd-Grf4bTcZXHaHLUjOtNZMx3cwACNwQAAhwmkVfJpMRsyVY09B8E')
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
