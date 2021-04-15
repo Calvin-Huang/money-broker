@@ -36,8 +36,20 @@ def msg_listener(update: Update, context: CallbackContext):
         update.message.reply_sticker('CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E')
     elif '崩崩' in update.message.text:
         update.message.reply_sticker('CAACAgIAAxkBAAEBLAVgd-FvoMW8F3nVGqx0nOUyxIF-qAACYQQAAonq5QdmC3mfOHu_3h8E')
-    elif '梭哈' in update.message.text:
+    elif '梭哈' in update.message.text and '/梭哈' != update.message.text:
         update.message.reply_sticker('CAACAgUAAxkBAAEBLAhgd-Grf4bTcZXHaHLUjOtNZMx3cwACNwQAAhwmkVfJpMRsyVY09B8E')
+    elif update.message.text.startswith('?pcs ') and len(update.message.text.split(' ')) == 2:
+        update.message.reply_text('/swap pancake 1 {} wbnb busd'.format(update.message.text.split(' ')[1]))
+    elif update.message.text.startswith('?uni ') and len(update.message.text.split(' ')) == 2:
+        update.message.reply_text('/swap uni 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
+    elif update.message.text.startswith('?sushi ') and len(update.message.text.split(' ')) == 2:
+        update.message.reply_text('/swap sushi 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
+    elif update.message.text.startswith('?pcs ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
+        update.message.reply_text('/swap pancake 1 {} wbnb busd'.format(update.message.text.split(' ')[1]))
+    elif update.message.text.startswith('?uni ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
+        update.message.reply_text('/swap uni 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
+    elif update.message.text.startswith('?sushi ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
+        update.message.reply_text('/swap sushi 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -243,6 +255,15 @@ def get_gas():
         return 'Low: {}\nAvg: {}\nHigh: {}\nfrom etherscan.io'.format(obj['result']['SafeGasPrice'], obj['result']['ProposeGasPrice'], obj['result']['FastGasPrice'])
     except:
         logger.info(r.text)
+
+
+def isfloat(value):
+  try:
+    float(value)
+    return True
+  except ValueError:
+    return False
+
 
 def main():
     logger.info('Token = {}'.format(TOKEN))
