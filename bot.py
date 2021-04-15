@@ -1,3 +1,4 @@
+import locale
 import json
 import logging
 import os
@@ -52,10 +53,14 @@ def msg_listener(update: Update, context: CallbackContext):
         msg.reply_text('/swap uni {} {} weth usdt'.format(txt.split(' ')[1], txt.split(' ')[2]))
     elif txt.startswith('?sushi ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[1]):
         msg.reply_text('/swap sushi {} {} weth usdt'.format(txt.split(' ')[1], txt.split(' ')[2]))
-    elif txt.strip().endswith('=?') and ('+' in txt or '-' in txt or '*' in txt or '/' in txt or '^' in txt):
+    elif (txt.endswith('=?') or txt.endswith('=$?')) and ('+' in txt or '-' in txt or '*' in txt or '/' in txt or '^' in txt):
         fomula = txt.split('=')[0].strip().replace('^', '**')
         try:
-            msg.reply_text('={}'.format(eval(fomula)))
+            if txt.endswith('=$?'):
+                locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+                msg.reply_text('={}'.format(locale.format("%.2f", eval(fomula), grouping=True)))
+            else:
+                msg.reply_text('={}'.format(eval(fomula)))
         except:
             msg.reply_sticker('CAACAgUAAxkBAAEBLBFgd_tZGLLQLj5O7kuE-r7chp_LOAAC_wEAAmmSQVVx1ECQ0wcNAh8E')
 
