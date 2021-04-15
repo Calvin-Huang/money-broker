@@ -46,14 +46,15 @@ def msg_listener(update: Update, context: CallbackContext):
         msg.reply_text('/swap uni 1 {} weth usdt'.format(txt.split(' ')[1]))
     elif txt.startswith('?sushi ') and len(txt.split(' ')) == 2:
         msg.reply_text('/swap sushi 1 {} weth usdt'.format(txt.split(' ')[1]))
-    elif txt.startswith('?pcs ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[2]):
-        msg.reply_text('/swap pancake {} {} wbnb busd'.format(txt.split(' ')[2], txt.split(' ')[1]))
-    elif txt.startswith('?uni ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[2]):
-        msg.reply_text('/swap uni {} {} weth usdt'.format(txt.split(' ')[2], txt.split(' ')[1]))
-    elif txt.startswith('?sushi ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[2]):
-        msg.reply_text('/swap sushi {} {} weth usdt'.format(txt.split(' ')[2], txt.split(' ')[1]))
+    elif txt.startswith('?pcs ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[1]):
+        msg.reply_text('/swap pancake {} {} wbnb busd'.format(txt.split(' ')[1], txt.split(' ')[2]))
+    elif txt.startswith('?uni ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[1]):
+        msg.reply_text('/swap uni {} {} weth usdt'.format(txt.split(' ')[1], txt.split(' ')[2]))
+    elif txt.startswith('?sushi ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[1]):
+        msg.reply_text('/swap sushi {} {} weth usdt'.format(txt.split(' ')[1], txt.split(' ')[2]))
     elif txt.strip().endswith('=?') and ('+' in txt or '-' in txt or '*' in txt or '/' in txt):
-        msg.reply_text('={}'.format(eval(txt.split('=')[0].strip())))
+        fomula = txt.split('=')[0].strip().replace('^', '**')
+        msg.reply_text('={}'.format(eval(fomula)))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
