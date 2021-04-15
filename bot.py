@@ -18,6 +18,7 @@ APPNAME = os.environ["APPNAME"]
 PORT = int(os.environ.get('PORT', '8443'))
 TOKEN = os.environ["TOKEN"]
 MOONPAYKEY = os.environ["MOONPAYKEY"]
+ETHERSCANKEY = os.environ["ETHERSCANKEY"]
 cache = Cache()
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -227,17 +228,13 @@ def get_ust():
     return obj['UST']['USD']
 
 
-@cache.memoize(ttl=10, typed=True)
+@cache.memoize(ttl=3, typed=True)
 def get_gas():
-    r = requests.get('https://etherscan.io/datasourceHandler?q=gashistoricaldata&draw=1&columns%5B2%5D%5Bdata%5D=safeGasPrice&columns%5B2%5D%5Bsearchable%5D=true&columns%5B2%5D%5Borderable%5D=true&columns%5B2%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B3%5D%5Bdata%5D=proposeGasPrice&columns%5B3%5D%5Bsearchable%5D=true&columns%5B3%5D%5Borderable%5D=true&columns%5B3%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B4%5D%5Bdata%5D=fastGasPrice&order%5B0%5D%5Bcolumn%5D=1&order%5B0%5D%5Bdir%5D=desc&length=10', 
+    r = requests.get('https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={}'.format(ETHERSCANKEY), 
     headers = {'host': 'etherscan.io', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'})    
     try:
         obj = json.loads(r.text)
-        safeGasPrice = sum(map(lambda x: int(x['safeGasPrice'].split(' ')[0]), obj['data']))
-        proposeGasPrice = sum(map(lambda x: int(x['proposeGasPrice'].split(' ')[0]), obj['data']))
-        fastGasPrice = sum(map(lambda x: int(x['fastGasPrice'].split(' ')[0]), obj['data']))
-        lenth = len(obj['data'])
-        return 'Low: {}\nAvg: {}\nHigh: {}'.format(int(safeGasPrice / lenth), int(proposeGasPrice / lenth), int(fastGasPrice / lenth))
+        return 'Low: {}\nAvg: {}\nHigh: {}'.format(obj['result']['SafeGasPrice'], obj['result']['ProposeGasPrice'], obj['result']['FastGasPrice'])
     except:
         logger.info(r.text)
 
