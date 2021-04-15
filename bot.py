@@ -54,7 +54,10 @@ def msg_listener(update: Update, context: CallbackContext):
         msg.reply_text('/swap sushi {} {} weth usdt'.format(txt.split(' ')[1], txt.split(' ')[2]))
     elif txt.strip().endswith('=?') and ('+' in txt or '-' in txt or '*' in txt or '/' in txt or '^' in txt):
         fomula = txt.split('=')[0].strip().replace('^', '**')
-        msg.reply_text('={}'.format(eval(fomula)))
+        try:
+            msg.reply_text('={}'.format(eval(fomula)))
+        except:
+            msg.reply_sticker('CAACAgUAAxkBAAEBLBFgd_tZGLLQLj5O7kuE-r7chp_LOAAC_wEAAmmSQVVx1ECQ0wcNAh8E')
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
