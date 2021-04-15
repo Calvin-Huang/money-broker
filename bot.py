@@ -32,6 +32,9 @@ def error(update, context):
 def msg_listener(update: Update, context: CallbackContext):
     if '?gas' == update.message.text.lower():
         update.message.reply_text(get_gas())
+    elif '啪' in update.message.text:
+        update.message.reply_sticker('CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E ')
+
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -234,7 +237,7 @@ def get_gas():
     headers = {'host': 'etherscan.io', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'})    
     try:
         obj = json.loads(r.text)
-        return 'Low: {}\nAvg: {}\nHigh: {}'.format(obj['result']['SafeGasPrice'], obj['result']['ProposeGasPrice'], obj['result']['FastGasPrice'])
+        return 'Low: {}\nAvg: {}\nHigh: {}\nfrom etherscan.io'.format(obj['result']['SafeGasPrice'], obj['result']['ProposeGasPrice'], obj['result']['FastGasPrice'])
     except:
         logger.info(r.text)
 
