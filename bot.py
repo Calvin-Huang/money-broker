@@ -33,7 +33,7 @@ def msg_listener(update: Update, context: CallbackContext):
     if '?gas' == update.message.text.lower():
         update.message.reply_text(get_gas())
     elif '啪' in update.message.text:
-        update.message.reply_sticker('CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E ')
+        update.message.reply_sticker('CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E')
 
 
 
