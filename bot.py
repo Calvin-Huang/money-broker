@@ -45,11 +45,11 @@ def msg_listener(update: Update, context: CallbackContext):
     elif update.message.text.startswith('?sushi ') and len(update.message.text.split(' ')) == 2:
         update.message.reply_text('/swap sushi 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
     elif update.message.text.startswith('?pcs ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
-        update.message.reply_text('/swap pancake 1 {} wbnb busd'.format(update.message.text.split(' ')[1]))
+        update.message.reply_text('/swap pancake {} {} wbnb busd'.format(update.message.text.split(' ')[2], update.message.text.split(' ')[1]))
     elif update.message.text.startswith('?uni ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
-        update.message.reply_text('/swap uni 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
+        update.message.reply_text('/swap uni {} {} weth usdt'.format(update.message.text.split(' ')[2], update.message.text.split(' ')[1]))
     elif update.message.text.startswith('?sushi ') and len(update.message.text.split(' ')) == 3 and isfloat(update.message.text.split(' ')[2]):
-        update.message.reply_text('/swap sushi 1 {} weth usdt'.format(update.message.text.split(' ')[1]))
+        update.message.reply_text('/swap sushi {} {} weth usdt'.format(update.message.text.split(' ')[2], update.message.text.split(' ')[1]))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
