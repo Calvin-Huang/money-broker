@@ -52,8 +52,8 @@ def msg_listener(update: Update, context: CallbackContext):
         msg.reply_text('/swap uni {} {} weth usdt'.format(txt.split(' ')[2], txt.split(' ')[1]))
     elif txt.startswith('?sushi ') and len(txt.split(' ')) == 3 and isfloat(txt.split(' ')[2]):
         msg.reply_text('/swap sushi {} {} weth usdt'.format(txt.split(' ')[2], txt.split(' ')[1]))
-    elif txt.startswith('?') and txt.endswith('=') and ('+' in txt or '-' in txt or '*' in txt or '/' in txt):
-        msg.reply_text('={}'.format(eval(txt.split('?')[1].strip().split('=')[0].strip())))
+    elif txt.strip().endswith('=?') and ('+' in txt or '-' in txt or '*' in txt or '/' in txt):
+        msg.reply_text('={}'.format(eval(txt.split('=')[0].strip())))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
