@@ -10,6 +10,8 @@ from lxml import html
 from telegram.ext import (
     Updater,
     CommandHandler,
+    MessageHandler,
+    Filters,
     CallbackContext)
 
 APPNAME = os.environ["APPNAME"]
@@ -24,6 +26,11 @@ logger = logging.getLogger(__name__)
 
 def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
+
+
+def msg_listener(update: Update, context: CallbackContext):
+    if '?gas' == update.message.text.lower():
+        update.message.reply_text(get_gas())
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -220,6 +227,17 @@ def get_ust():
     return obj['UST']['USD']
 
 
+@cache.memoize(ttl=10, typed=True)
+def get_gas():
+    r = requests.get('https://etherscan.io/datasourceHandler?q=gashistoricaldata&draw=1&columns%5B2%5D%5Bdata%5D=safeGasPrice&columns%5B2%5D%5Bsearchable%5D=true&columns%5B2%5D%5Borderable%5D=true&columns%5B2%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B3%5D%5Bdata%5D=proposeGasPrice&columns%5B3%5D%5Bsearchable%5D=true&columns%5B3%5D%5Borderable%5D=true&columns%5B3%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B4%5D%5Bdata%5D=fastGasPrice&order%5B0%5D%5Bcolumn%5D=1&order%5B0%5D%5Bdir%5D=desc&length=10')
+    obj = json.loads(r.text)
+    safeGasPrice = sum(map(lambda x: int(x['safeGasPrice'].split(' ')[0]), obj['data']))
+    proposeGasPrice = sum(map(lambda x: int(x['proposeGasPrice'].split(' ')[0]), obj['data']))
+    fastGasPrice = sum(map(lambda x: int(x['fastGasPrice'].split(' ')[0]), obj['data']))
+    lenth = len(obj['data'])
+    return 'Low: {}\nAvg: {}\nHigh: {}'.format(int(safeGasPrice / lenth), int(proposeGasPrice / lenth), int(fastGasPrice / lenth))
+
+
 def main():
     logger.info('Token = {}'.format(TOKEN))
     updater = Updater(TOKEN)
@@ -241,6 +259,7 @@ def main():
     dp.add_handler(CommandHandler('howdoyouturnthison', ask_combine))
     dp.add_handler(CommandHandler('ust', ask_ust))
     dp.add_handler(CommandHandler('esun', ask_usd_rate_esunbank))
+    dp.add_handler(MessageHandler(Filters.text, msg_listener))
     updater.start_webhook(listen="0.0.0.0",
                           port=PORT,
                           url_path=TOKEN)
