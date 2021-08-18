@@ -436,7 +436,6 @@ def loop_alert_cakebnb():
     bot = Bot(token=TOKEN)
     while True:
         cake, bnb, cakebnb = get_cakebnb()
-        time.sleep(3)
         if cakebnb >= 0.06:
             bot.send_message(
                 text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉\r\n{USER_NAME}",
@@ -446,7 +445,7 @@ def loop_alert_cakebnb():
                 text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉",
                 chat_id=USER_ID,
             )
-        if cakebnb <= 0.05:
+        elif cakebnb <= 0.05:
             bot.send_message(
                 text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉\r\n{USER_NAME}",
                 chat_id=GROUP_ID,
@@ -455,6 +454,9 @@ def loop_alert_cakebnb():
                 text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉",
                 chat_id=USER_ID,
             )
+        else:
+            logger.info(f"cake/bnb={cakebnb}")
+        time.sleep(5)
 
 
 if __name__ == "__main__":
