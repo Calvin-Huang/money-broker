@@ -174,10 +174,11 @@ def ask_ust(update: Update, context: CallbackContext):
 def ask_cakebnb(update: Update, context: CallbackContext):
     cake = get_ftx_price("CAKE-PERP")
     bnb = get_ftx_price("BNB-PERP")
+    value = cake / bnb
     if cake == -1 or bnb == -1:
         update.message.reply_text(f"=error")
     else:
-        update.message.reply_text(f"CAKE/BNB = {cake}/{bnb} = {cake/bnb}")
+        update.message.reply_text(f"CAKE/BNB = {cake}/{bnb} = {value}")
 
 
 def get_ftx_price(name: str):
