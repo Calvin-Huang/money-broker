@@ -187,7 +187,8 @@ async def get_usd_rete_from_3rd():
 
 async def get_usd_rate():
     usd_rate = await get_usd_rete_from_3rd()
-    return f"USD Rate\n[BUY]\nMastercard: {usd_rate[0]} TWD\nVisa: {usd_rate[1]} TWD\nJCB: {usd_rate[2]} TWD\n[SELL]\n玉山: {await get_usd_rate_esunbank()} TWD"
+    esun_usd_rate = await get_usd_rate_esunbank()
+    return f"USD Rate\n[BUY]\nMastercard: {usd_rate[0]} TWD\nVisa: {usd_rate[1]} TWD\nJCB: {usd_rate[2]} TWD\n[SELL]\n玉山: {esun_usd_rate} TWD"
 
 
 async def get_usd_rate_esunbank():
