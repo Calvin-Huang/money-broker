@@ -389,8 +389,12 @@ def main():
         MessageHandler(filters=Filters.text, callback=msg_listener, run_async=True)
     )
     logger.info(f"Start Webhook, Port={PORT}")
-    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook(f"https://{APPNAME}.herokuapp.com/{TOKEN}")
+    updater.start_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        url_path=TOKEN,
+        webhook_url=f"https://{APPNAME}.herokuapp.com/{TOKEN}",
+    )
     # updater.start_polling()
     updater.idle()
 
