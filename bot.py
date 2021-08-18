@@ -471,6 +471,7 @@ def loop_alert_cakebnb():
 
             logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
             sleep_time = 60 if cakebnb <= 0.05 or cakebnb >= 0.06 else 10
+            logger.info(f"sleep {sleep_time}s")
             time.sleep(sleep_time)
         except Exception as e:
             logger.error(f"error when loop_alert_cakebnb, {e}")
