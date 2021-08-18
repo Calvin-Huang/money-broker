@@ -1,3 +1,4 @@
+import asyncio
 import hmac
 import json
 import locale
@@ -456,9 +457,13 @@ def loop_alert_cakebnb():
             )
         else:
             logger.info(f"cake/bnb={cakebnb}")
+            bot.send_message(
+                text=f"CAKE/BNB 價格比 {cakebnb} ({cake}/{bnb})",
+                chat_id=USER_ID,
+            )
         time.sleep(5)
 
 
 if __name__ == "__main__":
     main()
-    loop_alert_cakebnb()
+    asyncio.run(loop_alert_cakebnb())
