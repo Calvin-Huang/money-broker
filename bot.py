@@ -1,4 +1,3 @@
-import asyncio
 import json
 import locale
 import logging
@@ -17,11 +16,11 @@ from telegram.ext import (
     Updater,
 )
 
-APPNAME = os.environ["APPNAME"]
-PORT = int(os.environ.get("PORT", "8443"))
-TOKEN = os.environ["TOKEN"]
-MOONPAYKEY = os.environ["MOONPAYKEY"]
-ETHERSCANKEY = os.environ["ETHERSCANKEY"]
+APPNAME = os.getenv("APPNAME")
+PORT = int(os.getenv("PORT", default=8443))
+TOKEN = os.getenv("TOKEN")
+MOONPAYKEY = os.getenv("MOONPAYKEY")
+ETHERSCANKEY = os.getenv("ETHERSCANKEY")
 cache = Cache()
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
