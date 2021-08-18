@@ -445,35 +445,38 @@ def main():
 
 
 def loop_alert_cakebnb():
-    bot = Bot(token=TOKEN)
     sleep_time = 5
     while True:
-        cake, bnb, cakebnb = get_cakebnb()
-        if cakebnb >= 0.06:
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉\r\n{USER_NAME}",
-                chat_id=GROUP_ID,
-            )
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉",
-                chat_id=USER_ID,
-            )
-        elif cakebnb <= 0.05:
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉\r\n{USER_NAME}",
-                chat_id=GROUP_ID,
-            )
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉",
-                chat_id=USER_ID,
-            )
+        try:
+            bot = Bot(token=TOKEN)
+            cake, bnb, cakebnb = get_cakebnb()
+            if cakebnb >= 0.06:
+                bot.send_message(
+                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉\r\n{USER_NAME}",
+                    chat_id=GROUP_ID,
+                )
+                bot.send_message(
+                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉",
+                    chat_id=USER_ID,
+                )
+            elif cakebnb <= 0.05:
+                bot.send_message(
+                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉\r\n{USER_NAME}",
+                    chat_id=GROUP_ID,
+                )
+                bot.send_message(
+                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉",
+                    chat_id=USER_ID,
+                )
 
-        logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
-        if cakebnb <= 0.05 or cakebnb >= 0.06:
-            sleep_time = 30
+            logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
+            if cakebnb <= 0.05 or cakebnb >= 0.06:
+                sleep_time = 30
 
-        time.sleep(sleep_time)
-        sleep_time = 5
+            time.sleep(sleep_time)
+            sleep_time = 5
+        except Exception as e:
+            logger.error(f"error when loop_alert_cakebnb, {e}")
 
 
 if __name__ == "__main__":
