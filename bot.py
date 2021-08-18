@@ -17,7 +17,7 @@ from telegram.ext import (
 )
 
 APPNAME = os.getenv("APPNAME")
-PORT = int(os.getenv("TG_HOOK_PORT", default=8443))
+PORT = int(os.getenv("PORT", default=8443))
 TOKEN = os.getenv("TOKEN")
 MOONPAYKEY = os.getenv("MOONPAYKEY")
 ETHERSCANKEY = os.getenv("ETHERSCANKEY")
