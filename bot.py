@@ -174,7 +174,10 @@ def ask_ust(update: Update, context: CallbackContext):
 def ask_cakebnb(update: Update, context: CallbackContext):
     cake = get_ftx_price("CAKE-PERP")
     bnb = get_ftx_price("BNB-PERP")
-    update.message.reply_text(f"CAKE/BNB={cake}\r\n{bnb}")
+    if cake == -1 or bnb == -1:
+        update.message.reply_text(f"=error")
+    else:
+        update.message.reply_text(f"CAKE/BNB={cake/bnb}")
 
 
 def get_ftx_price(name: str):
@@ -185,7 +188,11 @@ def get_ftx_price(name: str):
     headers = {"FTX-KEY": FTX_KEY, "FTX-SIGN": signature, "FTX-TS": str(ts)}
     r = requests.get(url=url, headers=headers)
     logger.info(f"get {name}={r.text}")
-    return r.text
+    robj = r.json()
+    if robj["success"]:
+        return ["result"]["price"]
+    else:
+        return -1
 
 
 def get_usd_rete_from_3rd():
