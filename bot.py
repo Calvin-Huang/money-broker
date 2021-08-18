@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 import requests
 from bs4 import BeautifulSoup
 from cacheout import Cache
-from telegram import Update
+from telegram import Update, Bot
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
@@ -25,6 +25,9 @@ MOONPAYKEY = os.getenv("MOONPAYKEY")
 ETHERSCANKEY = os.getenv("ETHERSCANKEY")
 FTX_KEY = os.getenv("FTX_KEY")
 FTX_SECRET = os.getenv("FTX_SECRET")
+GROUP_ID = os.getenv("GROUP_ID")
+USER_ID = os.getenv("USER_ID")
+USER_NAME = os.getenv("USER_NAME")
 
 cache = Cache()
 logging.basicConfig(
@@ -173,13 +176,18 @@ def ask_ust(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=1, typed=True)
 def ask_cakebnb(update: Update, context: CallbackContext):
-    bnb = round(get_ftx_price("BNB-PERP"), 3)
-    cake = round(get_ftx_price("CAKE-PERP"), 3)
-    cakebnb = round(cake / bnb, 4)
+    cake, bnb, cakebnb = get_cakebnb()
     if cake == -1 or bnb == -1:
         update.message.reply_text(f"=error")
     else:
         update.message.reply_text(f"CAKE/BNB = {cake}/{bnb} = {cakebnb}")
+
+
+def get_cakebnb():
+    bnb = round(get_ftx_price("BNB-PERP"), 3)
+    cake = round(get_ftx_price("CAKE-PERP"), 3)
+    cakebnb = round(cake / bnb, 4)
+    return (cake, bnb, cakebnb)
 
 
 def get_ftx_price(name: str):
@@ -424,5 +432,31 @@ def main():
     updater.idle()
 
 
+def loop_alert_cakebnb():
+    bot = Bot(token=TOKEN)
+    while True:
+        cake, bnb, cakebnb = get_cakebnb()
+        time.sleep(3)
+        if cakebnb >= 0.06:
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉\r\n{USER_NAME}",
+                chat_id=GROUP_ID,
+            )
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉",
+                chat_id=USER_ID,
+            )
+        if cakebnb <= 0.05:
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉\r\n{USER_NAME}",
+                chat_id=GROUP_ID,
+            )
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉",
+                chat_id=USER_ID,
+            )
+
+
 if __name__ == "__main__":
     main()
+    loop_alert_cakebnb()
