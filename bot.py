@@ -198,7 +198,6 @@ def get_ftx_price(name: str):
     signature = hmac.new(FTX_SECRET.encode(), signature_payload, "sha256").hexdigest()
     headers = {"FTX-KEY": FTX_KEY, "FTX-SIGN": signature, "FTX-TS": str(ts)}
     r = requests.get(url=url, headers=headers)
-    logger.info(f"get {name}={r.text}")
     robj = r.json()
     if robj["success"]:
         return robj["result"]["price"]
