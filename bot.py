@@ -192,16 +192,28 @@ def get_cakebnb():
 
 
 def get_ftx_price(name: str):
-    url = f"https://ftx.com/api/markets/{name}"
-    ts = int(time.time() * 1000)
-    signature_payload = f"{ts}GET{url}".encode()
-    signature = hmac.new(FTX_SECRET.encode(), signature_payload, "sha256").hexdigest()
-    headers = {"FTX-KEY": FTX_KEY, "FTX-SIGN": signature, "FTX-TS": str(ts)}
-    r = requests.get(url=url, headers=headers)
-    robj = r.json()
-    if robj["success"]:
-        return robj["result"]["price"]
-    else:
+    logger.info(f"get {name}")
+    try:
+        url = f"https://ftx.com/api/markets/{name}"
+        ts = int(time.time() * 1000)
+        signature_payload = f"{ts}GET{url}".encode()
+        signature = hmac.new(
+            FTX_SECRET.encode(), signature_payload, "sha256"
+        ).hexdigest()
+        headers = {"FTX-KEY": FTX_KEY, "FTX-SIGN": signature, "FTX-TS": str(ts)}
+        r = requests.get(url=url, headers=headers)
+        if r.status_code == 200:
+            robj = r.json()
+            if robj["success"]:
+                return robj["result"]["price"]
+            else:
+                return -1
+        else:
+            logger.error(
+                f"error when get {name}, code={r.status_code}, response={r.text}"
+            )
+    except Exception as e:
+        logger.error(f"error when get {name}, error {e}")
         return -1
 
 
