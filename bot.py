@@ -177,7 +177,7 @@ def ask_cakebnb(update: Update, context: CallbackContext):
     if cake == -1 or bnb == -1:
         update.message.reply_text(f"=error")
     else:
-        update.message.reply_text(f"CAKE/BNB={cake/bnb}")
+        update.message.reply_text(f"CAKE/BNB = {cake}/{bnb} = {cake/bnb}")
 
 
 def get_ftx_price(name: str):
