@@ -1,4 +1,4 @@
-python-telegram-bot==13.7
+python-telegram-bot==13.0
 beautifulsoup4==4.9.3
 cacheout==0.13.1
 httpx==0.18.2
