@@ -32,11 +32,11 @@ def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
-async def msg_listener(update: Update, context: CallbackContext):
+def msg_listener(update: Update, context: CallbackContext):
     msg = update.message
     txt = msg.text.strip()
     if "?gas" == txt.lower():
-        msg.reply_text(await get_gas())
+        msg.reply_text(get_gas())
     elif "啪" in txt or "沒了" in txt:
         msg.reply_sticker(
             "CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E"
@@ -97,33 +97,33 @@ async def msg_listener(update: Update, context: CallbackContext):
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-async def ask_mastercard_rate(update: Update, context: CallbackContext):
-    update.message.reply_text("USD = {} TWD".format(await get_usd_rete_from_3rd()[0]))
+def ask_mastercard_rate(update: Update, context: CallbackContext):
+    update.message.reply_text("USD = {} TWD".format(get_usd_rete_from_3rd()[0]))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-async def ask_visa_rate(update: Update, context: CallbackContext):
-    update.message.reply_text("USD = {} TWD".format(await get_usd_rete_from_3rd()[1]))
+def ask_visa_rate(update: Update, context: CallbackContext):
+    update.message.reply_text("USD = {} TWD".format(get_usd_rete_from_3rd()[1]))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-async def ask_jcb_rate(update: Update, context: CallbackContext):
-    update.message.reply_text("USD = {} TWD".format(await get_usd_rete_from_3rd()[2]))
+def ask_jcb_rate(update: Update, context: CallbackContext):
+    update.message.reply_text("USD = {} TWD".format(get_usd_rete_from_3rd()[2]))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-async def ask_usd_rate(update: Update, context: CallbackContext):
-    update.message.reply_text(await get_usd_rate())
+def ask_usd_rate(update: Update, context: CallbackContext):
+    update.message.reply_text(get_usd_rate())
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-async def ask_usd_rate_esunbank(update: Update, context: CallbackContext):
-    update.message.reply_text("玉山買入USD = {} TWD".format(await get_usd_rate_esunbank()))
+def ask_usd_rate_esunbank(update: Update, context: CallbackContext):
+    update.message.reply_text("玉山買入USD = {} TWD".format(get_usd_rate_esunbank()))
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
-async def ask_ace(update: Update, context: CallbackContext):
-    price = await get_ace_price()
+def ask_ace(update: Update, context: CallbackContext):
+    price = get_ace_price()
     if price > -1:
         update.message.reply_text("Ace\nUSDT = {} TWD".format(price))
     else:
@@ -131,10 +131,10 @@ async def ask_ace(update: Update, context: CallbackContext):
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
-async def ask_bito(update: Update, context: CallbackContext):
+def ask_bito(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
     # tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-    price = await get_bito_price(utc_now)
+    price = get_bito_price(utc_now)
     if price > -1:
         update.message.reply_text("BitoPro\nUSDT = {} TWD".format(price))
     else:
@@ -142,8 +142,8 @@ async def ask_bito(update: Update, context: CallbackContext):
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
-async def ask_max(update: Update, context: CallbackContext):
-    price = await get_max_price()
+def ask_max(update: Update, context: CallbackContext):
+    price = get_max_price()
     if price > -1:
         update.message.reply_text("Max\nUSDT = {} TWD".format(price))
     else:
@@ -151,18 +151,18 @@ async def ask_max(update: Update, context: CallbackContext):
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
-async def ask_usdt(update: Update, context: CallbackContext):
-    update.message.reply_text(await get_usdt())
+def ask_usdt(update: Update, context: CallbackContext):
+    update.message.reply_text(get_usdt())
 
 
 @cache.memoize(ttl=60 * 60 * 4, typed=True)
-async def ask_combine(update: Update, context: CallbackContext):
-    update.message.reply_text("{}\n\n{}".format(get_usdt(), await get_usd_rate()))
+def ask_combine(update: Update, context: CallbackContext):
+    update.message.reply_text("{}\n\n{}".format(get_usdt(), get_usd_rate()))
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
-async def ask_ust(update: Update, context: CallbackContext):
-    update.message.reply_text("Mirror Wallet UST = {} USD".format(await get_ust()))
+def ask_ust(update: Update, context: CallbackContext):
+    update.message.reply_text("Mirror Wallet UST = {} USD".format(get_ust()))
 
 
 async def get_usd_rete_from_3rd():
