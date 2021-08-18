@@ -456,6 +456,7 @@ def loop_alert_cakebnb():
                 chat_id=USER_ID,
             )
 
+        logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
         if cakebnb <= 0.05 or cakebnb >= 0.06:
             sleep_time = 30
 
