@@ -1,3 +1,4 @@
+import asyncio
 import json
 import locale
 import logging
@@ -351,33 +352,34 @@ def isfloat(value):
         return False
 
 
-def main():
+async def main():
     logger.info("Token = {}".format(TOKEN))
     updater = Updater(TOKEN)
     dp = updater.dispatcher
     dp.add_error_handler(error)
-    dp.add_handler(CommandHandler("m", ask_mastercard_rate))
-    dp.add_handler(CommandHandler("master", ask_mastercard_rate))
-    dp.add_handler(CommandHandler("v", ask_visa_rate))
-    dp.add_handler(CommandHandler("visa", ask_visa_rate))
-    dp.add_handler(CommandHandler("j", ask_jcb_rate))
-    dp.add_handler(CommandHandler("jcb", ask_jcb_rate))
-    dp.add_handler(CommandHandler("r", ask_usd_rate))
-    dp.add_handler(CommandHandler("rate", ask_usd_rate))
-    dp.add_handler(CommandHandler("ace", ask_ace))
-    dp.add_handler(CommandHandler("bito", ask_bito))
-    dp.add_handler(CommandHandler("max", ask_max))
-    dp.add_handler(CommandHandler("u", ask_usdt))
-    dp.add_handler(CommandHandler("usdt", ask_usdt))
-    dp.add_handler(CommandHandler("howdoyouturnthison", ask_combine))
-    dp.add_handler(CommandHandler("ust", ask_ust))
-    dp.add_handler(CommandHandler("esun", ask_usd_rate_esunbank))
-    dp.add_handler(MessageHandler(Filters.text, msg_listener))
+    dp.add_handler(CommandHandler("m", await ask_mastercard_rate))
+    dp.add_handler(CommandHandler("master", await ask_mastercard_rate))
+    dp.add_handler(CommandHandler("v", await ask_visa_rate))
+    dp.add_handler(CommandHandler("visa", await ask_visa_rate))
+    dp.add_handler(CommandHandler("j", await ask_jcb_rate))
+    dp.add_handler(CommandHandler("jcb", await ask_jcb_rate))
+    dp.add_handler(CommandHandler("r", await ask_usd_rate))
+    dp.add_handler(CommandHandler("rate", await ask_usd_rate))
+    dp.add_handler(CommandHandler("ace", await ask_ace))
+    dp.add_handler(CommandHandler("bito", await ask_bito))
+    dp.add_handler(CommandHandler("max", await ask_max))
+    dp.add_handler(CommandHandler("u", await ask_usdt))
+    dp.add_handler(CommandHandler("usdt", await ask_usdt))
+    dp.add_handler(CommandHandler("howdoyouturnthison", await ask_combine))
+    dp.add_handler(CommandHandler("ust", await ask_ust))
+    dp.add_handler(CommandHandler("esun", await ask_usd_rate_esunbank))
+    dp.add_handler(MessageHandler(Filters.text, await msg_listener))
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(APPNAME, TOKEN))
+    updater.bot.set_webhook(f"https://{APPNAME}.herokuapp.com/{TOKEN}")
     # updater.start_polling()
     updater.idle()
 
 
 if __name__ == "__main__":
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
