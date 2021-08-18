@@ -192,7 +192,7 @@ def get_ftx_price(name: str):
     logger.info(f"get {name}={r.text}")
     robj = r.json()
     if robj["success"]:
-        return ["result"]["price"]
+        return robj["result"]["price"]
     else:
         return -1
 
