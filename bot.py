@@ -455,7 +455,7 @@ def loop_alert_cakebnb():
                 chat_id=USER_ID,
             )
         else:
-            logger.info(f"cake/bnb={cakebnb}")
+            logger.info(f"cake/bnb={cakebnb} ({cake}/{bnb})")
             bot.send_message(
                 text=f"CAKE/BNB 價格比 {cakebnb} ({cake}/{bnb})",
                 chat_id=USER_ID,
