@@ -172,8 +172,8 @@ def ask_ust(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=1, typed=True)
 def ask_cakebnb(update: Update, context: CallbackContext):
-    bnb = round(get_ftx_price("BNB-PERP"), 5)
-    cake = round(get_ftx_price("CAKE-PERP"), 5)
+    bnb = round(get_ftx_price("BNB-PERP"), 3)
+    cake = round(get_ftx_price("CAKE-PERP"), 3)
     cakebnb = round(cake / bnb, 4)
     if cake == -1 or bnb == -1:
         update.message.reply_text(f"=error")
