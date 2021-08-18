@@ -1,10 +1,12 @@
-import requests
+import hmac
 import json
 import locale
 import logging
 import os
+import time
 from datetime import datetime, timedelta, timezone
 
+import requests
 from bs4 import BeautifulSoup
 from cacheout import Cache
 from telegram import Update
@@ -21,6 +23,9 @@ PORT = int(os.getenv("PORT", default=8443))
 TOKEN = os.getenv("TOKEN")
 MOONPAYKEY = os.getenv("MOONPAYKEY")
 ETHERSCANKEY = os.getenv("ETHERSCANKEY")
+FTX_KEY = os.getenv("FTX_KEY")
+FTX_SECRET = os.getenv("FTX_SECRET")
+
 cache = Cache()
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -165,8 +170,25 @@ def ask_ust(update: Update, context: CallbackContext):
     update.message.reply_text("Mirror Wallet UST = {} USD".format(get_ust()))
 
 
-def get_usd_rete_from_3rd():
+@cache.memoize(ttl=1, typed=True)
+def ask_cakebnb(update: Update, context: CallbackContext):
+    cake = get_ftx_price("CAKE-PERP")
+    bnb = get_ftx_price("BNB-PERP")
+    update.message.reply_text(f"CAKE/BNB={cake}\r\n{bnb}")
 
+
+def get_ftx_price(name: str):
+    url = f"https://ftx.com/api/markets/{name}"
+    ts = int(time.time() * 1000)
+    signature_payload = f"{ts}GET{url}".encode()
+    signature = hmac.new(FTX_SECRET.encode(), signature_payload, "sha256").hexdigest()
+    headers = {"FTX-KEY": FTX_KEY, "FTX-SIGN": signature, "FTX-TS": str(ts)}
+    r = requests.get(url=url, headers=headers)
+    logger.info(f"get {name}={r.text}")
+    return r.text
+
+
+def get_usd_rete_from_3rd():
     r = requests.get("https://www.bestxrate.com/card/mastercard/usd.html")
     soup = BeautifulSoup(r.text, "html.parser")
     masterCardRate = (
@@ -375,6 +397,9 @@ def main():
     dp.add_handler(CommandHandler(command="ust", callback=ask_ust, run_async=True))
     dp.add_handler(
         CommandHandler(command="esun", callback=ask_usd_rate_esunbank, run_async=True)
+    )
+    dp.add_handler(
+        CommandHandler(command="cakebnb", callback=ask_cakebnb, run_async=True)
     )
     dp.add_handler(
         MessageHandler(filters=Filters.text, callback=msg_listener, run_async=True)
