@@ -8,7 +8,6 @@ from datetime import datetime, timedelta, timezone
 import httpx
 from bs4 import BeautifulSoup
 from cacheout import Cache
-from lxml import html
 from telegram import Update
 from telegram.ext import (
     CallbackContext,
@@ -352,28 +351,44 @@ def isfloat(value):
         return False
 
 
-async def main():
+def main():
     logger.info("Token = {}".format(TOKEN))
     updater = Updater(TOKEN)
     dp = updater.dispatcher
     dp.add_error_handler(error)
-    dp.add_handler(CommandHandler("m", await ask_mastercard_rate))
-    dp.add_handler(CommandHandler("master", await ask_mastercard_rate))
-    dp.add_handler(CommandHandler("v", await ask_visa_rate))
-    dp.add_handler(CommandHandler("visa", await ask_visa_rate))
-    dp.add_handler(CommandHandler("j", await ask_jcb_rate))
-    dp.add_handler(CommandHandler("jcb", await ask_jcb_rate))
-    dp.add_handler(CommandHandler("r", await ask_usd_rate))
-    dp.add_handler(CommandHandler("rate", await ask_usd_rate))
-    dp.add_handler(CommandHandler("ace", await ask_ace))
-    dp.add_handler(CommandHandler("bito", await ask_bito))
-    dp.add_handler(CommandHandler("max", await ask_max))
-    dp.add_handler(CommandHandler("u", await ask_usdt))
-    dp.add_handler(CommandHandler("usdt", await ask_usdt))
-    dp.add_handler(CommandHandler("howdoyouturnthison", await ask_combine))
-    dp.add_handler(CommandHandler("ust", await ask_ust))
-    dp.add_handler(CommandHandler("esun", await ask_usd_rate_esunbank))
-    dp.add_handler(MessageHandler(Filters.text, await msg_listener))
+    dp.add_handler(
+        CommandHandler(command="m", callback=ask_mastercard_rate, run_async=True)
+    )
+    dp.add_handler(
+        CommandHandler(command="master", callback=ask_mastercard_rate, run_async=True)
+    )
+    dp.add_handler(CommandHandler(command="v", callback=ask_visa_rate, run_async=True))
+    dp.add_handler(
+        CommandHandler(command="visa", callback=ask_visa_rate, run_async=True)
+    )
+    dp.add_handler(CommandHandler(command="j", callback=ask_jcb_rate, run_async=True))
+    dp.add_handler(CommandHandler(command="jcb", callback=ask_jcb_rate, run_async=True))
+    dp.add_handler(CommandHandler(command="r", callback=ask_usd_rate, run_async=True))
+    dp.add_handler(
+        CommandHandler(command="rate", callback=ask_usd_rate, run_async=True)
+    )
+    dp.add_handler(CommandHandler(command="ace", callback=ask_ace, run_async=True))
+    dp.add_handler(CommandHandler(command="bito", callback=ask_bito, run_async=True))
+    dp.add_handler(CommandHandler(command="max", callback=ask_max, run_async=True))
+    dp.add_handler(CommandHandler(command="u", callback=ask_usdt, run_async=True))
+    dp.add_handler(CommandHandler(command="usdt", callback=ask_usdt, run_async=True))
+    dp.add_handler(
+        CommandHandler(
+            command="howdoyouturnthison", callback=ask_combine, run_async=True
+        )
+    )
+    dp.add_handler(CommandHandler(command="ust", callback=ask_ust, run_async=True))
+    dp.add_handler(
+        CommandHandler(command="esun", callback=ask_usd_rate_esunbank, run_async=True)
+    )
+    dp.add_handler(
+        MessageHandler(filters=Filters.text, callback=msg_listener, run_async=True)
+    )
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
     updater.bot.set_webhook(f"https://{APPNAME}.herokuapp.com/{TOKEN}")
     # updater.start_polling()
@@ -381,5 +396,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    main()
