@@ -473,7 +473,7 @@ def loop_alert_cakebnb():
             if cakebnb <= 0.05 or cakebnb >= 0.06:
                 sleep_time = 30
 
-            time.sleep(sleep_time)
+            asyncio.sleep(sleep_time)
             sleep_time = 5
         except Exception as e:
             logger.error(f"error when loop_alert_cakebnb, {e}")
@@ -481,4 +481,4 @@ def loop_alert_cakebnb():
 
 if __name__ == "__main__":
     main()
-    asyncio.run(loop_alert_cakebnb())
+    asyncio.get_event_loop().run_until_complete(loop_alert_cakebnb())
