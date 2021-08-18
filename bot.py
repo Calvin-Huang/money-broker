@@ -8,6 +8,7 @@ import httpx
 from bs4 import BeautifulSoup
 from cacheout import Cache
 from telegram import Update
+from telegram.ext.dispatcher import run_asyn
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
@@ -32,6 +33,7 @@ def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
+@run_asyn
 async def msg_listener(update: Update, context: CallbackContext):
     msg = update.message
     txt = msg.text.strip()
@@ -96,31 +98,37 @@ async def msg_listener(update: Update, context: CallbackContext):
             )
 
 
+@run_asyn
 @cache.memoize(ttl=10 * 60, typed=True)
 async def ask_mastercard_rate(update: Update, context: CallbackContext):
     update.message.reply_text("USD = {} TWD".format(await get_usd_rete_from_3rd()[0]))
 
 
+@run_asyn
 @cache.memoize(ttl=10 * 60, typed=True)
 async def ask_visa_rate(update: Update, context: CallbackContext):
     update.message.reply_text("USD = {} TWD".format(await get_usd_rete_from_3rd()[1]))
 
 
+@run_asyn
 @cache.memoize(ttl=10 * 60, typed=True)
 async def ask_jcb_rate(update: Update, context: CallbackContext):
     update.message.reply_text("USD = {} TWD".format(await get_usd_rete_from_3rd()[2]))
 
 
+@run_asyn
 @cache.memoize(ttl=10 * 60, typed=True)
 async def ask_usd_rate(update: Update, context: CallbackContext):
     update.message.reply_text(await get_usd_rate())
 
 
+@run_asyn
 @cache.memoize(ttl=10 * 60, typed=True)
 async def ask_usd_rate_esunbank(update: Update, context: CallbackContext):
     update.message.reply_text("玉山買入USD = {} TWD".format(await get_usd_rate_esunbank()))
 
 
+@run_asyn
 @cache.memoize(ttl=3 * 60, typed=True)
 async def ask_ace(update: Update, context: CallbackContext):
     price = await get_ace_price()
@@ -130,6 +138,7 @@ async def ask_ace(update: Update, context: CallbackContext):
         update.message.reply_text("Ace\n找不到資料(可能死了)")
 
 
+@run_asyn
 @cache.memoize(ttl=3 * 60, typed=True)
 async def ask_bito(update: Update, context: CallbackContext):
     utc_now = datetime.now(timezone.utc)
@@ -141,6 +150,7 @@ async def ask_bito(update: Update, context: CallbackContext):
         update.message.reply_text("BitoPro\n找不到資料(可能死了)")
 
 
+@run_asyn
 @cache.memoize(ttl=3 * 60, typed=True)
 async def ask_max(update: Update, context: CallbackContext):
     price = await get_max_price()
@@ -150,16 +160,19 @@ async def ask_max(update: Update, context: CallbackContext):
         update.message.reply_text("Max\n找不到資料(可能死了)")
 
 
+@run_asyn
 @cache.memoize(ttl=3 * 60, typed=True)
 async def ask_usdt(update: Update, context: CallbackContext):
     update.message.reply_text(await get_usdt())
 
 
+@run_asyn
 @cache.memoize(ttl=60 * 60 * 4, typed=True)
 async def ask_combine(update: Update, context: CallbackContext):
     update.message.reply_text("{}\n\n{}".format(get_usdt(), await get_usd_rate()))
 
 
+@run_asyn
 @cache.memoize(ttl=10 * 60, typed=True)
 async def ask_ust(update: Update, context: CallbackContext):
     update.message.reply_text("Mirror Wallet UST = {} USD".format(await get_ust()))
