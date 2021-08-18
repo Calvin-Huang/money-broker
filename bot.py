@@ -445,7 +445,7 @@ def main():
 
 
 def loop_alert_cakebnb():
-    sleep_time = 5
+    sleep_time = 10
     bot = Bot(token=TOKEN)
     while True:
         try:
@@ -471,7 +471,7 @@ def loop_alert_cakebnb():
 
             logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
             sleep_time = 60 if cakebnb <= 0.05 or cakebnb >= 0.06 else 10
-            asyncio.sleep(sleep_time)
+            time.sleep(sleep_time)
         except Exception as e:
             logger.error(f"error when loop_alert_cakebnb, {e}")
 
