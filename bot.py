@@ -40,6 +40,7 @@ def error(update, context):
 def msg_listener(update: Update, context: CallbackContext):
     msg = update.message
     txt = msg.text.strip()
+    logger.info(f"user_id={msg.from_user.id}, chat_id={msg.chat.id}, chat_text={txt}")
     if "?gas" == txt.lower():
         msg.reply_text(get_gas())
     elif "啪" in txt or "沒了" in txt:
