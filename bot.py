@@ -42,68 +42,80 @@ def error(update, context):
 
 
 def msg_listener(update: Update, context: CallbackContext):
-    msg = update.message
-    txt = msg.text.strip()
-    logger.info(f"user_id={msg.from_user.id}, chat_id={msg.chat.id}, chat_text={txt}")
-    if "?gas" == txt.lower():
-        msg.reply_text(get_gas())
-    elif "啪" in txt or "沒了" in txt:
-        msg.reply_sticker(
-            "CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E"
-        )
-    elif "崩崩" in txt:
-        msg.reply_sticker(
-            "CAACAgIAAxkBAAEBLAVgd-FvoMW8F3nVGqx0nOUyxIF-qAACYQQAAonq5QdmC3mfOHu_3h8E"
-        )
-    elif "梭哈" in txt and "/梭哈" != txt:
-        msg.reply_sticker(
-            "CAACAgUAAxkBAAEBLAhgd-Grf4bTcZXHaHLUjOtNZMx3cwACNwQAAhwmkVfJpMRsyVY09B8E"
-        )
-    elif txt.startswith("?pcs ") and len(txt.split(" ")) == 2:
-        msg.reply_text("/swap pancake 1 {} wbnb busd".format(txt.split(" ")[1]))
-    elif txt.startswith("?uni ") and len(txt.split(" ")) == 2:
-        msg.reply_text("/swap uni 1 {} weth usdt".format(txt.split(" ")[1]))
-    elif txt.startswith("?sushi ") and len(txt.split(" ")) == 2:
-        msg.reply_text("/swap sushi 1 {} weth usdt".format(txt.split(" ")[1]))
-    elif (
-        txt.startswith("?pcs ")
-        and len(txt.split(" ")) == 3
-        and isfloat(txt.split(" ")[1])
-    ):
-        msg.reply_text(
-            "/swap pancake {} {} wbnb busd".format(txt.split(" ")[1], txt.split(" ")[2])
-        )
-    elif (
-        txt.startswith("?uni ")
-        and len(txt.split(" ")) == 3
-        and isfloat(txt.split(" ")[1])
-    ):
-        msg.reply_text(
-            "/swap uni {} {} weth usdt".format(txt.split(" ")[1], txt.split(" ")[2])
-        )
-    elif (
-        txt.startswith("?sushi ")
-        and len(txt.split(" ")) == 3
-        and isfloat(txt.split(" ")[1])
-    ):
-        msg.reply_text(
-            "/swap sushi {} {} weth usdt".format(txt.split(" ")[1], txt.split(" ")[2])
-        )
-    elif (txt.endswith("=?") or txt.endswith("=$?") or txt.endswith("=$")) and (
-        "+" in txt or "-" in txt or "*" in txt or "/" in txt or "^" in txt
-    ):
-        fomula = txt.split("=")[0].strip().replace("^", "**")
-        try:
-            if txt.endswith("=$?") or txt.endswith("=$"):
-                locale.setlocale(locale.LC_ALL, "en_US.utf8")
-                result = locale.format("%.2f", eval(fomula), grouping=True)
-                msg.reply_text(f"={result}")
-            else:
-                msg.reply_text("={}".format(eval(fomula)))
-        except:
-            msg.reply_sticker(
-                "CAACAgUAAxkBAAEBLBFgd_tZGLLQLj5O7kuE-r7chp_LOAAC_wEAAmmSQVVx1ECQ0wcNAh8E"
+    if update.message:
+        msg = update.message
+        if msg.text:
+            txt = msg.text.strip()
+            logger.info(
+                f"chat={msg.chat.title}({msg.chat.id}), "
+                f"user={msg.from_user.first_name} {msg.from_user.last_name} ({msg.from_user.id}), "
+                f"text={txt}"
             )
+            if "?gas" == txt.lower():
+                msg.reply_text(get_gas())
+            elif "啪" in txt or "沒了" in txt:
+                msg.reply_sticker(
+                    "CAACAgUAAxkBAAEBLAJgd99sMMuqwAfwa9FOzEtglxLn4AAClwIAArjQcVewe5BU0CNqSB8E"
+                )
+            elif "崩崩" in txt:
+                msg.reply_sticker(
+                    "CAACAgIAAxkBAAEBLAVgd-FvoMW8F3nVGqx0nOUyxIF-qAACYQQAAonq5QdmC3mfOHu_3h8E"
+                )
+            elif "梭哈" in txt and "/梭哈" != txt:
+                msg.reply_sticker(
+                    "CAACAgUAAxkBAAEBLAhgd-Grf4bTcZXHaHLUjOtNZMx3cwACNwQAAhwmkVfJpMRsyVY09B8E"
+                )
+            elif txt.startswith("?pcs ") and len(txt.split(" ")) == 2:
+                msg.reply_text("/swap pancake 1 {} wbnb busd".format(txt.split(" ")[1]))
+            elif txt.startswith("?uni ") and len(txt.split(" ")) == 2:
+                msg.reply_text("/swap uni 1 {} weth usdt".format(txt.split(" ")[1]))
+            elif txt.startswith("?sushi ") and len(txt.split(" ")) == 2:
+                msg.reply_text("/swap sushi 1 {} weth usdt".format(txt.split(" ")[1]))
+            elif (
+                txt.startswith("?pcs ")
+                and len(txt.split(" ")) == 3
+                and isfloat(txt.split(" ")[1])
+            ):
+                msg.reply_text(
+                    "/swap pancake {} {} wbnb busd".format(
+                        txt.split(" ")[1], txt.split(" ")[2]
+                    )
+                )
+            elif (
+                txt.startswith("?uni ")
+                and len(txt.split(" ")) == 3
+                and isfloat(txt.split(" ")[1])
+            ):
+                msg.reply_text(
+                    "/swap uni {} {} weth usdt".format(
+                        txt.split(" ")[1], txt.split(" ")[2]
+                    )
+                )
+            elif (
+                txt.startswith("?sushi ")
+                and len(txt.split(" ")) == 3
+                and isfloat(txt.split(" ")[1])
+            ):
+                msg.reply_text(
+                    "/swap sushi {} {} weth usdt".format(
+                        txt.split(" ")[1], txt.split(" ")[2]
+                    )
+                )
+            elif (txt.endswith("=?") or txt.endswith("=$?") or txt.endswith("=$")) and (
+                "+" in txt or "-" in txt or "*" in txt or "/" in txt or "^" in txt
+            ):
+                fomula = txt.split("=")[0].strip().replace("^", "**")
+                try:
+                    if txt.endswith("=$?") or txt.endswith("=$"):
+                        locale.setlocale(locale.LC_ALL, "en_US.utf8")
+                        result = locale.format("%.2f", eval(fomula), grouping=True)
+                        msg.reply_text(f"={result}")
+                    else:
+                        msg.reply_text("={}".format(eval(fomula)))
+                except:
+                    msg.reply_sticker(
+                        "CAACAgUAAxkBAAEBLBFgd_tZGLLQLj5O7kuE-r7chp_LOAAC_wEAAmmSQVVx1ECQ0wcNAh8E"
+                    )
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
