@@ -1,4 +1,4 @@
-import asyncio
+import threading
 import hmac
 import json
 import locale
@@ -447,36 +447,36 @@ def main():
 def loop_alert_cakebnb():
     sleep_time = 10
     bot = Bot(token=TOKEN)
-    while True:
-        try:
-            cake, bnb, cakebnb = get_cakebnb()
-            if cakebnb >= 0.06:
-                bot.send_message(
-                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉\r\n{USER_NAME}",
-                    chat_id=GROUP_ID,
-                )
-                bot.send_message(
-                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉",
-                    chat_id=USER_ID,
-                )
-            elif cakebnb <= 0.05:
-                bot.send_message(
-                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉\r\n{USER_NAME}",
-                    chat_id=GROUP_ID,
-                )
-                bot.send_message(
-                    text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉",
-                    chat_id=USER_ID,
-                )
+    try:
+        cake, bnb, cakebnb = get_cakebnb()
+        if cakebnb >= 0.06:
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉\r\n{USER_NAME}",
+                chat_id=GROUP_ID,
+            )
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉",
+                chat_id=USER_ID,
+            )
+        elif cakebnb <= 0.05:
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉\r\n{USER_NAME}",
+                chat_id=GROUP_ID,
+            )
+            bot.send_message(
+                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉",
+                chat_id=USER_ID,
+            )
 
-            logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
-            sleep_time = 60 if cakebnb <= 0.05 or cakebnb >= 0.06 else 10
-            logger.info(f"sleep {sleep_time}s")
-            time.sleep(sleep_time)
-        except Exception as e:
-            logger.error(f"error when loop_alert_cakebnb, {e}")
+        logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
+        sleep_time = 60 if cakebnb <= 0.05 or cakebnb >= 0.06 else 10
+        logger.info(f"sleep {sleep_time}s")
+        time.sleep(sleep_time)
+    except Exception as e:
+        logger.error(f"error when loop_alert_cakebnb, {e}")
 
 
 if __name__ == "__main__":
     main()
-    asyncio.get_event_loop().run_until_complete(loop_alert_cakebnb())
+    t = threading.Thread(target=loop_alert_cakebnb)
+    t.start()
