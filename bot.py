@@ -19,16 +19,25 @@ from telegram.ext import (
     Updater,
 )
 
-APPNAME = os.getenv("APPNAME")
-PORT = int(os.getenv("PORT", default=8443))
-TOKEN = os.getenv("TOKEN")
+# TG BOT
+TG_BOT_WEBHOOK_URL = os.getenv("TG_BOT_WEBHOOK_URL")
+TG_BOT_PORT = int(os.getenv("TG_BOT_PORT", default=8443))
+TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN")
+TG_BOT_DEBUG_GROUP_ID = os.getenv("TG_BOT_DEBUG_GROUP_ID")
+TG_NIPPLES_GROUP_ID = os.getenv("TG_NIPPLES_GROUP_ID")
+TG_ADMIN_USER_ID = os.getenv("TG_ADMIN_USER_ID")
+TG_ALERT_USER_NAME = os.getenv("TG_ALERT_USER_NAME")
+
+# CAKEBNB
+CAKEBNB_EMERGENCY_RATE = float(os.getenv("CAKEBNB_EMERGENCY_RATE"))
+CAKEBNB_LOW_RATE = float(os.getenv("CAKEBNB_LOW_RATE"))
+CAKEBNB_HIGH_RATE = float(os.getenv("CAKEBNB_HIGH_RATE"))
+
+# API AUTH
 MOONPAYKEY = os.getenv("MOONPAYKEY")
 ETHERSCANKEY = os.getenv("ETHERSCANKEY")
 FTX_KEY = os.getenv("FTX_KEY")
 FTX_SECRET = os.getenv("FTX_SECRET")
-GROUP_ID = os.getenv("GROUP_ID")
-USER_ID = os.getenv("USER_ID")
-USER_NAME = os.getenv("USER_NAME")
 
 cache = Cache()
 logging.basicConfig(
@@ -405,8 +414,8 @@ def isfloat(value):
 
 
 def main():
-    logger.info(f"Token={TOKEN}")
-    updater = Updater(TOKEN)
+    logger.info(f"Token={TG_BOT_TOKEN}")
+    updater = Updater(TG_BOT_TOKEN)
     dp = updater.dispatcher
     dp.add_error_handler(error)
     dp.add_handler(
@@ -445,47 +454,87 @@ def main():
     dp.add_handler(
         MessageHandler(filters=Filters.text, callback=msg_listener, run_async=True)
     )
-    logger.info(f"Start Webhook, Port={PORT}")
+
+    logger.info(f"Start Webhook, Port={TG_BOT_PORT}")
     updater.start_webhook(
         listen="0.0.0.0",
-        port=PORT,
-        url_path=TOKEN,
-        webhook_url=f"https://{APPNAME}.herokuapp.com/{TOKEN}",
+        port=TG_BOT_PORT,
+        url_path=TG_BOT_TOKEN,
+        webhook_url=f"{TG_BOT_WEBHOOK_URL}/{TG_BOT_TOKEN}",
     )
     # updater.start_polling()
     updater.idle()
 
 
-def loop_alert_cakebnb():
-    sleep_time = 10
-    bot = Bot(token=TOKEN)
-    try:
-        cake, bnb, cakebnb = get_cakebnb()
-        if cakebnb >= 0.06:
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉\r\n{USER_NAME}",
-                chat_id=GROUP_ID,
-            )
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議平倉",
-                chat_id=USER_ID,
-            )
-        elif cakebnb <= 0.05:
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉\r\n{USER_NAME}",
-                chat_id=GROUP_ID,
-            )
-            bot.send_message(
-                text=f"CAKE/BNB 價格比到達 {cakebnb} ({cake}/{bnb})\r\n建議加倉",
-                chat_id=USER_ID,
-            )
+def send_msg(bot: Bot, chat_id: str, text: str):
+    bot.send_message(chat_id=chat_id, text=text)
 
-        logger.info(f"CAKE/BNB = {cakebnb} ({cake}/{bnb})")
-        sleep_time = 60 if cakebnb <= 0.05 or cakebnb >= 0.06 else 10
-        logger.info(f"sleep {sleep_time}s")
-        time.sleep(sleep_time)
+
+def get_cakebnb():
+    bnb = round(get_ftx_price("BNB-PERP"), 3)
+    cake = round(get_ftx_price("CAKE-PERP"), 3)
+    cakebnb = round(cake / bnb, 4)
+    return (cake, bnb, cakebnb)
+
+
+def get_ftx_price(bot: Bot, name: str):
+    try:
+        url = f"https://ftx.com/api/markets/{name}"
+        ts = int(time.time() * 1000)
+        signature_payload = f"{ts}GET{url}".encode()
+        signature = hmac.new(
+            FTX_SECRET.encode(), signature_payload, "sha256"
+        ).hexdigest()
+        headers = {"FTX-KEY": FTX_KEY, "FTX-SIGN": signature, "FTX-TS": str(ts)}
+        r = requests.get(url=url, headers=headers)
+        if r.status_code == 200:
+            robj = r.json()
+            if robj["success"]:
+                return robj["result"]["price"]
+            else:
+                return -1
+        else:
+            send_msg(
+                bot,
+                TG_ADMIN_USER_ID,
+                f"[ERROR] ask {name} price got ({r.status_code}) {r.text}",
+            )
+            send_msg(
+                bot,
+                TG_BOT_DEBUG_GROUP_ID,
+                f"[ERROR] ask {name} price got ({r.status_code}) {r.text}",
+            )
     except Exception as e:
-        logger.error(f"error when loop_alert_cakebnb, {e}")
+        send_msg(bot, TG_ADMIN_USER_ID, f"[ERROR] ask {name} price got {e}")
+        send_msg(bot, TG_BOT_DEBUG_GROUP_ID, f"[ERROR] ask {name} price got {e}")
+        return -1
+
+
+def loop_alert_cakebnb():
+    bot = Bot(token=TG_BOT_TOKEN)
+    try:
+        while True:
+            cake, bnb, cakebnb = get_cakebnb()
+            if cake != -1 and bnb != -1:
+                msg = f"CAKE/BNB 價格比 {cakebnb} ({cake}/{bnb})"
+                if cakebnb <= CAKEBNB_EMERGENCY_RATE:
+                    msg = f"{msg}\r\n建議平倉止損"
+                elif cakebnb <= CAKEBNB_LOW_RATE:
+                    msg = f"{msg}\r\n建議加倉"
+                elif cakebnb >= CAKEBNB_HIGH_RATE:
+                    msg = f"{msg}\r\n建議平倉獲利"
+
+                if cakebnb <= CAKEBNB_LOW_RATE or cakebnb >= CAKEBNB_HIGH_RATE:
+                    send_msg(
+                        bot,
+                        TG_NIPPLES_GROUP_ID,
+                        f"{msg}\r\n{TG_ALERT_USER_NAME}",
+                    )
+                    send_msg(bot, TG_ADMIN_USER_ID, msg)
+                send_msg(bot, TG_BOT_DEBUG_GROUP_ID, msg)
+            time.sleep(5)
+    except Exception as e:
+        send_msg(bot, TG_ADMIN_USER_ID, f"[ERROR] main, {e}")
 
 
 if __name__ == "__main__":
