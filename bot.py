@@ -7,6 +7,7 @@ import threading
 import time
 from datetime import datetime, timedelta, timezone
 
+import dotenv
 import requests
 from bs4 import BeautifulSoup
 from cacheout import Cache
@@ -19,9 +20,11 @@ from telegram.ext import (
     Updater,
 )
 
+dotenv.load_dotenv()
+
 # TG BOT
 TG_BOT_WEBHOOK_URL = os.getenv("TG_BOT_WEBHOOK_URL")
-TG_BOT_PORT = int(os.getenv("TG_BOT_PORT", default=8443))
+TG_BOT_PORT = int(os.getenv("TG_BOT_PORT", default=5000))
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN")
 TG_BOT_DEBUG_GROUP_ID = os.getenv("TG_BOT_DEBUG_GROUP_ID")
 TG_NIPPLES_GROUP_ID = os.getenv("TG_NIPPLES_GROUP_ID")
@@ -75,20 +78,18 @@ def msg_listener(update: Update, context: CallbackContext):
                     "CAACAgUAAxkBAAEBLAhgd-Grf4bTcZXHaHLUjOtNZMx3cwACNwQAAhwmkVfJpMRsyVY09B8E"
                 )
             elif txt.startswith("?pcs ") and len(txt.split(" ")) == 2:
-                msg.reply_text("/swap pancake 1 {} wbnb busd".format(txt.split(" ")[1]))
+                msg.reply_text(f"/swap pancake 1 {txt.split(' ')[1]} wbnb busd")
             elif txt.startswith("?uni ") and len(txt.split(" ")) == 2:
-                msg.reply_text("/swap uni 1 {} weth usdt".format(txt.split(" ")[1]))
+                msg.reply_text(f"/swap uni 1 {txt.split(' ')[1]} weth usdt")
             elif txt.startswith("?sushi ") and len(txt.split(" ")) == 2:
-                msg.reply_text("/swap sushi 1 {} weth usdt".format(txt.split(" ")[1]))
+                msg.reply_text(f"/swap sushi 1 {txt.split(' ')[1]} weth usdt")
             elif (
                 txt.startswith("?pcs ")
                 and len(txt.split(" ")) == 3
                 and isfloat(txt.split(" ")[1])
             ):
                 msg.reply_text(
-                    "/swap pancake {} {} wbnb busd".format(
-                        txt.split(" ")[1], txt.split(" ")[2]
-                    )
+                    f"/swap pancake {txt.split(' ')[1]} {txt.split(' ')[2]} wbnb busd"
                 )
             elif (
                 txt.startswith("?uni ")
@@ -96,9 +97,7 @@ def msg_listener(update: Update, context: CallbackContext):
                 and isfloat(txt.split(" ")[1])
             ):
                 msg.reply_text(
-                    "/swap uni {} {} weth usdt".format(
-                        txt.split(" ")[1], txt.split(" ")[2]
-                    )
+                    f"/swap uni {txt.split(' ')[1]} {txt.split(' ')[2]} weth usdt"
                 )
             elif (
                 txt.startswith("?sushi ")
@@ -106,9 +105,7 @@ def msg_listener(update: Update, context: CallbackContext):
                 and isfloat(txt.split(" ")[1])
             ):
                 msg.reply_text(
-                    "/swap sushi {} {} weth usdt".format(
-                        txt.split(" ")[1], txt.split(" ")[2]
-                    )
+                    f"/swap sushi {txt.split(' ')[1]} {txt.split(' ')[2]} weth usdt"
                 )
             elif (txt.endswith("=?") or txt.endswith("=$?") or txt.endswith("=$")) and (
                 "+" in txt or "-" in txt or "*" in txt or "/" in txt or "^" in txt
@@ -120,7 +117,7 @@ def msg_listener(update: Update, context: CallbackContext):
                         result = locale.format("%.2f", eval(fomula), grouping=True)
                         msg.reply_text(f"={result}")
                     else:
-                        msg.reply_text("={}".format(eval(fomula)))
+                        msg.reply_text(f"={eval(fomula)}")
                 except:
                     msg.reply_sticker(
                         "CAACAgUAAxkBAAEBLBFgd_tZGLLQLj5O7kuE-r7chp_LOAAC_wEAAmmSQVVx1ECQ0wcNAh8E"
@@ -129,17 +126,17 @@ def msg_listener(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_mastercard_rate(update: Update, context: CallbackContext):
-    update.message.reply_text("USD = {} TWD".format(get_usd_rete_from_3rd()[0]))
+    update.message.reply_text(f"USD = {get_usd_rete_from_3rd()[0]} TWD")
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_visa_rate(update: Update, context: CallbackContext):
-    update.message.reply_text("USD = {} TWD".format(get_usd_rete_from_3rd()[1]))
+    update.message.reply_text(f"USD = {get_usd_rete_from_3rd()[1]} TWD")
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_jcb_rate(update: Update, context: CallbackContext):
-    update.message.reply_text("USD = {} TWD".format(get_usd_rete_from_3rd()[2]))
+    update.message.reply_text(f"USD = {get_usd_rete_from_3rd()[2]} TWD")
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
@@ -149,14 +146,14 @@ def ask_usd_rate(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_usd_rate_esunbank(update: Update, context: CallbackContext):
-    update.message.reply_text("玉山買入USD = {} TWD".format(get_usd_rate_esunbank()))
+    update.message.reply_text("玉山買入USD = {get_usd_rate_esunbank()} TWD")
 
 
 @cache.memoize(ttl=3 * 60, typed=True)
 def ask_ace(update: Update, context: CallbackContext):
     price = get_ace_price()
     if price > -1:
-        update.message.reply_text("Ace\nUSDT = {} TWD".format(price))
+        update.message.reply_text(f"Ace\nUSDT = {price} TWD")
     else:
         update.message.reply_text("Ace\n找不到資料(可能死了)")
 
@@ -167,7 +164,7 @@ def ask_bito(update: Update, context: CallbackContext):
     # tw_time = (utc_now + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
     price = get_bito_price(utc_now)
     if price > -1:
-        update.message.reply_text("BitoPro\nUSDT = {} TWD".format(price))
+        update.message.reply_text(f"BitoPro\nUSDT = {price} TWD")
     else:
         update.message.reply_text("BitoPro\n找不到資料(可能死了)")
 
@@ -176,7 +173,7 @@ def ask_bito(update: Update, context: CallbackContext):
 def ask_max(update: Update, context: CallbackContext):
     price = get_max_price()
     if price > -1:
-        update.message.reply_text("Max\nUSDT = {} TWD".format(price))
+        update.message.reply_text(f"Max\nUSDT = {price} TWD")
     else:
         update.message.reply_text("Max\n找不到資料(可能死了)")
 
@@ -188,54 +185,21 @@ def ask_usdt(update: Update, context: CallbackContext):
 
 @cache.memoize(ttl=60 * 60 * 4, typed=True)
 def ask_combine(update: Update, context: CallbackContext):
-    update.message.reply_text("{}\n\n{}".format(get_usdt(), get_usd_rate()))
+    update.message.reply_text(f"{get_usdt()}\n\n{get_usd_rate()}")
 
 
 @cache.memoize(ttl=10 * 60, typed=True)
 def ask_ust(update: Update, context: CallbackContext):
-    update.message.reply_text("Mirror Wallet UST = {} USD".format(get_ust()))
+    update.message.reply_text(f"Mirror Wallet UST = {get_ust()} USD")
 
 
 @cache.memoize(ttl=1, typed=True)
 def ask_cakebnb(update: Update, context: CallbackContext):
-    cake, bnb, cakebnb = get_cakebnb()
+    cake, bnb, cakebnb = get_cakebnb(Bot(token=TG_BOT_TOKEN))
     if cake == -1 or bnb == -1:
-        update.message.reply_text(f"=error")
+        update.message.reply_text("=error")
     else:
         update.message.reply_text(f"CAKE/BNB = {cake}/{bnb} = {cakebnb}")
-
-
-def get_cakebnb():
-    bnb = round(get_ftx_price("BNB-PERP"), 3)
-    cake = round(get_ftx_price("CAKE-PERP"), 3)
-    cakebnb = round(cake / bnb, 4)
-    return (cake, bnb, cakebnb)
-
-
-def get_ftx_price(name: str):
-    logger.info(f"get {name}")
-    try:
-        url = f"https://ftx.com/api/markets/{name}"
-        ts = int(time.time() * 1000)
-        signature_payload = f"{ts}GET{url}".encode()
-        signature = hmac.new(
-            FTX_SECRET.encode(), signature_payload, "sha256"
-        ).hexdigest()
-        headers = {"FTX-KEY": FTX_KEY, "FTX-SIGN": signature, "FTX-TS": str(ts)}
-        r = requests.get(url=url, headers=headers)
-        if r.status_code == 200:
-            robj = r.json()
-            if robj["success"]:
-                return robj["result"]["price"]
-            else:
-                return -1
-        else:
-            logger.error(
-                f"error when get {name}, code={r.status_code}, response={r.text}"
-            )
-    except Exception as e:
-        logger.error(f"error when get {name}, error {e}")
-        return -1
 
 
 def get_usd_rete_from_3rd():
@@ -372,9 +336,7 @@ def get_usdt():
         max_price = "死了(?)"
     else:
         max_price = max_price + " TWD"
-    return "USDT Price\nBitoPro: {}\nAce: {}\nMax: {}".format(
-        bito_price, ace_price, max_price
-    )
+    return f"USDT Price\nBitoPro: {bito_price}\nAce: {ace_price}\nMax: {max_price}"
 
 
 def get_ust():
@@ -396,11 +358,7 @@ def get_gas():
     )
     try:
         obj = json.loads(r.text)
-        return "Low: {}\nAvg: {}\nHigh: {}\nfrom etherscan.io".format(
-            obj["result"]["SafeGasPrice"],
-            obj["result"]["ProposeGasPrice"],
-            obj["result"]["FastGasPrice"],
-        )
+        return f"Low: {obj['result']['SafeGasPrice']}\nAvg: {obj['result']['ProposeGasPrice']}\nHigh: {obj['result']['FastGasPrice']}\nfrom etherscan.io"
     except:
         logger.info(r.text)
 
@@ -414,7 +372,6 @@ def isfloat(value):
 
 
 def main():
-    logger.info(f"Token={TG_BOT_TOKEN}")
     updater = Updater(TG_BOT_TOKEN)
     dp = updater.dispatcher
     dp.add_error_handler(error)
@@ -467,12 +424,12 @@ def main():
 
 
 def send_msg(bot: Bot, chat_id: str, text: str):
-    bot.send_message(chat_id=chat_id, text=text)
+    bot.send_message(chat_id=chat_id, text=text, timeout=10)
 
 
-def get_cakebnb():
-    bnb = round(get_ftx_price("BNB-PERP"), 3)
-    cake = round(get_ftx_price("CAKE-PERP"), 3)
+def get_cakebnb(bot: Bot):
+    bnb = round(get_ftx_price(bot, "BNB-PERP"), 3)
+    cake = round(get_ftx_price(bot, "CAKE-PERP"), 3)
     cakebnb = round(cake / bnb, 4)
     return (cake, bnb, cakebnb)
 
@@ -494,6 +451,7 @@ def get_ftx_price(bot: Bot, name: str):
             else:
                 return -1
         else:
+            logger.error(f"[ERROR] get_ftx_price, [{r.status_code}] {r.text}")
             send_msg(
                 bot,
                 TG_ADMIN_USER_ID,
@@ -505,6 +463,7 @@ def get_ftx_price(bot: Bot, name: str):
                 f"[ERROR] ask {name} price got ({r.status_code}) {r.text}",
             )
     except Exception as e:
+        logger.error(f"[ERROR] get_ftx_price, {e}")
         send_msg(bot, TG_ADMIN_USER_ID, f"[ERROR] ask {name} price got {e}")
         send_msg(bot, TG_BOT_DEBUG_GROUP_ID, f"[ERROR] ask {name} price got {e}")
         return -1
@@ -514,7 +473,7 @@ def loop_alert_cakebnb():
     bot = Bot(token=TG_BOT_TOKEN)
     try:
         while True:
-            cake, bnb, cakebnb = get_cakebnb()
+            cake, bnb, cakebnb = get_cakebnb(bot)
             if cake != -1 and bnb != -1:
                 msg = f"CAKE/BNB 價格比 {cakebnb} ({cake}/{bnb})"
                 if cakebnb <= CAKEBNB_EMERGENCY_RATE:
@@ -534,10 +493,29 @@ def loop_alert_cakebnb():
                 send_msg(bot, TG_BOT_DEBUG_GROUP_ID, msg)
             time.sleep(5)
     except Exception as e:
-        send_msg(bot, TG_ADMIN_USER_ID, f"[ERROR] main, {e}")
+        logger.error(f"[ERROR] loop_alert_cakebnb, {e}")
+        send_msg(bot, TG_ADMIN_USER_ID, f"[ERROR] loop_alert_cakebnb, {e}")
+
+
+def print_env():
+    logger.info(f"TG_BOT_WEBHOOK_URL={TG_BOT_WEBHOOK_URL}")
+    logger.info(f"TG_BOT_PORT={TG_BOT_PORT}")
+    logger.info(f"TG_BOT_TOKEN={TG_BOT_TOKEN}")
+    logger.info(f"TG_BOT_DEBUG_GROUP_ID={TG_BOT_DEBUG_GROUP_ID}")
+    logger.info(f"TG_NIPPLES_GROUP_ID={TG_NIPPLES_GROUP_ID}")
+    logger.info(f"TG_ADMIN_USER_ID={TG_ADMIN_USER_ID}")
+    logger.info(f"TG_ALERT_USER_NAME={TG_ALERT_USER_NAME}")
+    logger.info(f"CAKEBNB_EMERGENCY_RATE={CAKEBNB_EMERGENCY_RATE}")
+    logger.info(f"CAKEBNB_LOW_RATE={CAKEBNB_LOW_RATE}")
+    logger.info(f"CAKEBNB_HIGH_RATE={CAKEBNB_HIGH_RATE}")
+    logger.info(f"MOONPAYKEY={MOONPAYKEY}")
+    logger.info(f"ETHERSCANKEY={ETHERSCANKEY}")
+    logger.info(f"FTX_KEY={FTX_KEY}")
+    logger.info(f"FTX_SECRET={FTX_SECRET}")
 
 
 if __name__ == "__main__":
-    main()
+    print_env()
     t = threading.Thread(target=loop_alert_cakebnb)
     t.start()
+    main()
