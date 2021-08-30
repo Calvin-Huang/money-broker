@@ -114,7 +114,9 @@ def msg_listener(update: Update, context: CallbackContext):
                 try:
                     if txt.endswith("=$?") or txt.endswith("=$"):
                         locale.setlocale(locale.LC_ALL, "en_US.utf8")
-                        result = locale.format("%.2f", eval(fomula), grouping=True)
+                        result = locale.format_string(
+                            "%.2f", eval(fomula), grouping=True
+                        )
                         msg.reply_text(f"={result}")
                     else:
                         msg.reply_text(f"={eval(fomula)}")
