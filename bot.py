@@ -33,6 +33,7 @@ TG_NIPPLES_GROUP_ID = os.getenv("TG_NIPPLES_GROUP_ID")
 TG_ADMIN_USER_ID = os.getenv("TG_ADMIN_USER_ID")
 TG_ALERT_USER_NAME = os.getenv("TG_ALERT_USER_NAME")
 TG_AUTO_DELETE_TIME_SECOND = int(os.getenv("TG_AUTO_DELETE_TIME_SECOND", default=180))
+TG_START_VIA_WEBHOOK = bool(os.getenv("TG_START_VIA_WEBHOOK", default=True))
 
 # CAKEBNB
 CAKEBNB_EMERGENCY_RATE = float(os.getenv("CAKEBNB_EMERGENCY_RATE"))
@@ -417,14 +418,18 @@ def main():
         MessageHandler(filters=Filters.text, callback=msg_listener, run_async=True)
     )
 
-    logger.info(f"Start Webhook, Port={TG_BOT_PORT}")
-    # updater.start_polling()
-    updater.start_webhook(
-        listen="0.0.0.0",
-        port=TG_BOT_PORT,
-        url_path=TG_BOT_TOKEN,
-        webhook_url=f"{TG_BOT_WEBHOOK_URL}/{TG_BOT_TOKEN}",
-    )
+    if TG_START_VIA_WEBHOOK and TG_BOT_WEBHOOK_URL and TG_BOT_PORT:
+        logger.info(f"Bot Start Via Webhook, Port={TG_BOT_PORT}")
+        updater.start_webhook(
+            listen="0.0.0.0",
+            port=TG_BOT_PORT,
+            url_path=TG_BOT_TOKEN,
+            webhook_url=f"{TG_BOT_WEBHOOK_URL}/{TG_BOT_TOKEN}",
+        )
+    else:
+        logger.info(f"Bot Start Via Polling")
+        updater.start_polling()
+
     updater.idle()
 
 
