@@ -6,6 +6,7 @@ import os
 import threading
 import time
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 import dotenv
 import requests
@@ -31,7 +32,7 @@ TG_BOT_DEBUG_GROUP_ID = os.getenv("TG_BOT_DEBUG_GROUP_ID")
 TG_NIPPLES_GROUP_ID = os.getenv("TG_NIPPLES_GROUP_ID")
 TG_ADMIN_USER_ID = os.getenv("TG_ADMIN_USER_ID")
 TG_ALERT_USER_NAME = os.getenv("TG_ALERT_USER_NAME")
-TG_AUTO_DELETE_TIME_SECOND = int(os.getenv("TG_AUTO_DELETE_TIME_SECOND", default=60))
+TG_AUTO_DELETE_TIME_SECOND = int(os.getenv("TG_AUTO_DELETE_TIME_SECOND", default=180))
 
 # CAKEBNB
 CAKEBNB_EMERGENCY_RATE = float(os.getenv("CAKEBNB_EMERGENCY_RATE"))
@@ -427,8 +428,27 @@ def main():
     updater.idle()
 
 
-def send_msg(bot: Bot, chat_id: str, text: str) -> Message:
-    return bot.send_message(chat_id=chat_id, text=text, timeout=10)
+def send_msg(
+    bot: Bot, chat_id: str, text: str, auto_delete: Optional[bool] = False
+) -> Message:
+    if auto_delete:
+        text = f"{text}\r\n(訊息在{TG_AUTO_DELETE_TIME_SECOND}秒後刪除)"
+    msg = bot.send_message(chat_id=chat_id, text=text, timeout=10)
+    if auto_delete:
+        t = threading.Thread(
+            target=auto_delete_message,
+            args=(bot, msg.chat_id, msg.message_id),
+        )
+        t.start()
+    return msg
+
+
+def auto_delete_message(bot: Bot, chat_id: str, message_id: str):
+    time.sleep(TG_AUTO_DELETE_TIME_SECOND)
+    try:
+        bot.delete_message(chat_id, message_id)
+    except:
+        pass
 
 
 def get_cakebnb(bot: Bot):
@@ -475,10 +495,13 @@ def get_ftx_price(bot: Bot, name: str):
 
 def loop_alert_cakebnb():
     bot = Bot(token=TG_BOT_TOKEN)
+    ALERTED_CAKEBNB = 0
     try:
         while True:
             cake, bnb, cakebnb = get_cakebnb(bot)
-            if cake != -1 and bnb != -1:
+            logger.info(f"[loop_alert_cakebnb] ALERTED_CAKEBNB={ALERTED_CAKEBNB}")
+            if cake != -1 and bnb != -1 and cakebnb != ALERTED_CAKEBNB:
+                ALERTED_CAKEBNB = cakebnb
                 msg = f"CAKE/BNB 價格比 {cakebnb} ({cake}/{bnb})"
                 if cakebnb <= CAKEBNB_EMERGENCY_RATE:
                     msg = f"{msg}\r\n建議平倉止損"
@@ -488,40 +511,16 @@ def loop_alert_cakebnb():
                     msg = f"{msg}\r\n建議平倉獲利"
 
                 if cakebnb <= CAKEBNB_LOW_RATE or cakebnb >= CAKEBNB_HIGH_RATE:
-                    msg = send_msg(
-                        bot,
-                        TG_NIPPLES_GROUP_ID,
-                        f"{msg}\r\n{TG_ALERT_USER_NAME}",
+                    send_msg(
+                        bot, TG_NIPPLES_GROUP_ID, f"{msg}\r\n{TG_ALERT_USER_NAME}", True
                     )
-                    t = threading.Thread(
-                        target=auto_delete_message,
-                        args=(bot, msg.chat_id, msg.message_id),
-                    )
-                    t.start()
-                    msg = send_msg(bot, TG_ADMIN_USER_ID, msg)
-                    t = threading.Thread(
-                        target=auto_delete_message,
-                        args=(bot, msg.chat_id, msg.message_id),
-                    )
-                    t.start()
-                msg = send_msg(bot, TG_BOT_DEBUG_GROUP_ID, msg)
-                t = threading.Thread(
-                    target=auto_delete_message,
-                    args=(bot, msg.chat_id, msg.message_id),
-                )
-                t.start()
+                    send_msg(bot, TG_ADMIN_USER_ID, msg)
+                send_msg(bot, TG_BOT_DEBUG_GROUP_ID, msg, True)
+
             time.sleep(5)
     except Exception as e:
         logger.error(f"[ERROR] loop_alert_cakebnb, {e}")
         send_msg(bot, TG_ADMIN_USER_ID, f"[ERROR] loop_alert_cakebnb, {e}")
-
-
-def auto_delete_message(bot: Bot, chat_id: str, message_id: str):
-    time.sleep(TG_AUTO_DELETE_TIME_SECOND)
-    try:
-        bot.delete_message(chat_id, message_id)
-    except:
-        pass
 
 
 def print_env():
