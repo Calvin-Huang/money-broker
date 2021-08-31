@@ -19,6 +19,7 @@ from telegram.ext import (
     MessageHandler,
     Updater,
 )
+from telegram.message import Message
 
 dotenv.load_dotenv()
 
@@ -30,6 +31,7 @@ TG_BOT_DEBUG_GROUP_ID = os.getenv("TG_BOT_DEBUG_GROUP_ID")
 TG_NIPPLES_GROUP_ID = os.getenv("TG_NIPPLES_GROUP_ID")
 TG_ADMIN_USER_ID = os.getenv("TG_ADMIN_USER_ID")
 TG_ALERT_USER_NAME = os.getenv("TG_ALERT_USER_NAME")
+TG_AUTO_DELETE_TIME_SECOND = int(os.getenv("TG_AUTO_DELETE_TIME_SECOND", default=60))
 
 # CAKEBNB
 CAKEBNB_EMERGENCY_RATE = float(os.getenv("CAKEBNB_EMERGENCY_RATE"))
@@ -415,18 +417,18 @@ def main():
     )
 
     logger.info(f"Start Webhook, Port={TG_BOT_PORT}")
-    updater.start_webhook(
-        listen="0.0.0.0",
-        port=TG_BOT_PORT,
-        url_path=TG_BOT_TOKEN,
-        webhook_url=f"{TG_BOT_WEBHOOK_URL}/{TG_BOT_TOKEN}",
-    )
-    # updater.start_polling()
+    updater.start_polling()
+    #  updater.start_webhook(
+    #      listen="0.0.0.0",
+    #      port=TG_BOT_PORT,
+    #      url_path=TG_BOT_TOKEN,
+    #      webhook_url=f"{TG_BOT_WEBHOOK_URL}/{TG_BOT_TOKEN}",
+    #  )
     updater.idle()
 
 
-def send_msg(bot: Bot, chat_id: str, text: str):
-    bot.send_message(chat_id=chat_id, text=text, timeout=10)
+def send_msg(bot: Bot, chat_id: str, text: str) -> Message:
+    return bot.send_message(chat_id=chat_id, text=text, timeout=10)
 
 
 def get_cakebnb(bot: Bot):
@@ -486,17 +488,40 @@ def loop_alert_cakebnb():
                     msg = f"{msg}\r\n建議平倉獲利"
 
                 if cakebnb <= CAKEBNB_LOW_RATE or cakebnb >= CAKEBNB_HIGH_RATE:
-                    send_msg(
+                    msg = send_msg(
                         bot,
                         TG_NIPPLES_GROUP_ID,
                         f"{msg}\r\n{TG_ALERT_USER_NAME}",
                     )
-                    send_msg(bot, TG_ADMIN_USER_ID, msg)
-                send_msg(bot, TG_BOT_DEBUG_GROUP_ID, msg)
+                    t = threading.Thread(
+                        target=auto_delete_message,
+                        args=(bot, msg.chat_id, msg.message_id),
+                    )
+                    t.start()
+                    msg = send_msg(bot, TG_ADMIN_USER_ID, msg)
+                    t = threading.Thread(
+                        target=auto_delete_message,
+                        args=(bot, msg.chat_id, msg.message_id),
+                    )
+                    t.start()
+                msg = send_msg(bot, TG_BOT_DEBUG_GROUP_ID, msg)
+                t = threading.Thread(
+                    target=auto_delete_message,
+                    args=(bot, msg.chat_id, msg.message_id),
+                )
+                t.start()
             time.sleep(5)
     except Exception as e:
         logger.error(f"[ERROR] loop_alert_cakebnb, {e}")
         send_msg(bot, TG_ADMIN_USER_ID, f"[ERROR] loop_alert_cakebnb, {e}")
+
+
+def auto_delete_message(bot: Bot, chat_id: str, message_id: str):
+    time.sleep(TG_AUTO_DELETE_TIME_SECOND)
+    try:
+        bot.delete_message(chat_id, message_id)
+    except:
+        pass
 
 
 def print_env():
