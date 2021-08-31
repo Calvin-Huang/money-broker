@@ -418,13 +418,13 @@ def main():
     )
 
     logger.info(f"Start Webhook, Port={TG_BOT_PORT}")
-    updater.start_polling()
-    #  updater.start_webhook(
-    #      listen="0.0.0.0",
-    #      port=TG_BOT_PORT,
-    #      url_path=TG_BOT_TOKEN,
-    #      webhook_url=f"{TG_BOT_WEBHOOK_URL}/{TG_BOT_TOKEN}",
-    #  )
+    # updater.start_polling()
+    updater.start_webhook(
+        listen="0.0.0.0",
+        port=TG_BOT_PORT,
+        url_path=TG_BOT_TOKEN,
+        webhook_url=f"{TG_BOT_WEBHOOK_URL}/{TG_BOT_TOKEN}",
+    )
     updater.idle()
 
 
